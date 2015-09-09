@@ -67,9 +67,9 @@ namespace CSharpTradeOffers.Trading
         {
             var compatibleOffer = new TradeOffer();
 
-            foreach (CEconAsset cEconAsset in offer.ItemsToGive)
+            foreach (CEconAsset asset in offer.ItemsToGive)
             {
-                List<CEconAsset> assetsToAdd = FindCompatibleAssets(cEconAsset, ref myInventoryHandler, TradeSide.Me);
+                List<CEconAsset> assetsToAdd = FindCompatibleAssets(asset, ref myInventoryHandler, TradeSide.Me);
 
                 if (assetsToAdd == null)
                 {
@@ -82,9 +82,9 @@ namespace CSharpTradeOffers.Trading
                 }
             }
 
-            foreach (CEconAsset cEconAsset in offer.ItemsToReceive)
+            foreach (CEconAsset asset in offer.ItemsToReceive)
             {
-                List<CEconAsset> assetsToAdd = FindCompatibleAssets(cEconAsset, ref theirInventoryHandler, TradeSide.Them);
+                List<CEconAsset> assetsToAdd = FindCompatibleAssets(asset, ref theirInventoryHandler, TradeSide.Them);
 
                 if (assetsToAdd == null)
                 {
