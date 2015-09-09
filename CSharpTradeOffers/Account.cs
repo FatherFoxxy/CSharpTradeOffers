@@ -9,7 +9,7 @@ namespace CSharpTradeOffers
     {
         public Account(ulong steamId)
         {
-            //add validation later
+            // add validation later
             SteamId = steamId;
         }
 

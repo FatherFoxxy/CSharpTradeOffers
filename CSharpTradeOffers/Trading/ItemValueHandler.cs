@@ -23,14 +23,16 @@ namespace CSharpTradeOffers.Trading
             _path = path;
             _apiKey = apiKey;
 
-            if (File.Exists(_path)) throw new Exception("Path not found.");
+            if (File.Exists(_path))
+            {
+                throw new Exception("Path not found.");
+            }
 
             File.Create(_path).Close();
 
             #region append
 
             // BuildMyString.com generated code. Please enjoy your string responsibly.
-
             var sb = new StringBuilder();
 
             sb.Append("{\r\n");
@@ -73,96 +75,143 @@ namespace CSharpTradeOffers.Trading
             {
                 List<CEconAsset> assetsToAdd = FindCompatibleAssets(cEconAsset, ref myInventoryHandler, TradeSide.Me);
 
-                if (assetsToAdd == null) return null;
+                if (assetsToAdd == null)
+                {
+                    return null;
+                }
 
                 foreach (CEconAsset econAsset in assetsToAdd)
+                {
                     compatibleOffer.Them.Assets.Add(econAsset);
+                }
             }
 
             foreach (CEconAsset cEconAsset in offer.ItemsToReceive)
             {
                 List<CEconAsset> assetsToAdd = FindCompatibleAssets(cEconAsset, ref theirInventoryHandler, TradeSide.Them);
 
-                if (assetsToAdd == null) return null;
+                if (assetsToAdd == null)
+                {
+                    return null;
+                }
 
                 foreach (CEconAsset econAsset in assetsToAdd)
+                {
                     compatibleOffer.Me.Assets.Add(econAsset);
+                }
             }
 
             return compatibleOffer;
         }
 
-        //needs to support side
-        public List<CEconAsset> FindCompatibleAssets(CEconAsset asset, ref InventoryHandler inventoryHandler, TradeSide side) //side : 0 = anyone, 1 = us, 2 = Them
+        // needs to support side
+        public List<CEconAsset> FindCompatibleAssets(CEconAsset asset, ref InventoryHandler inventoryHandler, TradeSide side) // side : 0 = anyone, 1 = us, 2 = Them
         {
             List<CEconAsset> compatibleAssets = new List<CEconAsset>();
             foreach (ValuedItem valuedItem in ValuedItems.Items)
             {
-                if (valuedItem.Side != (int)side && valuedItem.Side != (int)TradeSide.None) continue; //which side should we be searching?
+                if (valuedItem.Side != (int)side && valuedItem.Side != (int)TradeSide.None)
+                {
+                    continue; // which side should we be searching?
+                }
 
                 switch (valuedItem.TypeId)
                 {
-                    case 0: //exact match
-                        if (asset.GetMarketHashName(_apiKey) != valuedItem.TypeObj) break;
+                    case 0: // exact match
+                        if (asset.GetMarketHashName(_apiKey) != valuedItem.TypeObj)
+                        {
+                            break;
+                        }
+
                         foreach (ValuedWorth valuedWorth in valuedItem.Worth)
                         {
                             for (int i = 0; i < valuedWorth.Amount; i++)
                             {
                                 RgInventoryItem rgInventoryItem =
                                     inventoryHandler.FindUnusedItem(valuedWorth).Items.FirstOrDefault(x => !x.InUse);
-                                if (rgInventoryItem == null) return null;
+                                if (rgInventoryItem == null)
+                                {
+                                    return null;
+                                }
+
                                 CEconAsset toAdd = rgInventoryItem.ToCEconAsset(valuedWorth.AppId.ToString());
                                 inventoryHandler.Inventories[valuedWorth.AppId].MarkAsset(toAdd, true);
                                 compatibleAssets.Add(toAdd);
                             }
                         }
+
                         break;
-                    case 1: //contains match
-                        if (asset.GetMarketHashName(_apiKey).Contains(valuedItem.TypeObj)) break;
+                    case 1: // contains match
+                        if (asset.GetMarketHashName(_apiKey).Contains(valuedItem.TypeObj))
+                        {
+                            break;
+                        }
+
                         foreach (ValuedWorth valuedWorth in valuedItem.Worth)
                         {
                             for (int i = 0; i < valuedWorth.Amount; i++)
                             {
                                 RgInventoryItem rgInventoryItem =
                                     inventoryHandler.FindUnusedItem(valuedWorth).Items.FirstOrDefault(x => !x.InUse);
-                                if (rgInventoryItem == null) return null;
+                                if (rgInventoryItem == null)
+                                {
+                                    return null;
+                                }
+
                                 CEconAsset toAdd = rgInventoryItem.ToCEconAsset(valuedWorth.AppId.ToString());
                                 inventoryHandler.Inventories[valuedWorth.AppId].MarkAsset(toAdd, true);
                                 compatibleAssets.Add(toAdd);
                             }
                         }
+
                         break;
-                    case 2: //starts with match
-                        if (asset.GetMarketHashName(_apiKey).StartsWith(valuedItem.TypeObj)) break;
+                    case 2: // starts with match
+                        if (asset.GetMarketHashName(_apiKey).StartsWith(valuedItem.TypeObj))
+                        {
+                            break;
+                        }
+
                         foreach (ValuedWorth valuedWorth in valuedItem.Worth)
                         {
                             for (int i = 0; i < valuedWorth.Amount; i++)
                             {
                                 RgInventoryItem rgInventoryItem =
                                     inventoryHandler.FindUnusedItem(valuedWorth).Items.FirstOrDefault(x => !x.InUse);
-                                if (rgInventoryItem == null) return null;
+                                if (rgInventoryItem == null)
+                                {
+                                    return null;
+                                }
+
                                 CEconAsset toAdd = rgInventoryItem.ToCEconAsset(valuedWorth.AppId.ToString());
                                 inventoryHandler.Inventories[valuedWorth.AppId].MarkAsset(toAdd, true);
                                 compatibleAssets.Add(toAdd);
                             }
                         }
+
                         break;
-                    case 3: //direct class id match
+                    case 3: // direct class id match
                         if (asset.ClassId == valuedItem.TypeObj)
+                        {
                             foreach (ValuedWorth valuedWorth in valuedItem.Worth)
                             {
                                 for (int i = 0; i < valuedWorth.Amount; i++)
                                 {
                                     RgInventoryItem rgInventoryItem =
                                         inventoryHandler.FindUnusedItem(valuedWorth).Items.FirstOrDefault(x => !x.InUse);
-                                    if (rgInventoryItem == null) return null;
+                                    if (rgInventoryItem == null)
+                                    {
+                                        return null;
+                                    }
+
                                     CEconAsset toAdd = rgInventoryItem.ToCEconAsset(valuedWorth.AppId.ToString());
                                     inventoryHandler.Inventories[valuedWorth.AppId].MarkAsset(toAdd, true);
                                     compatibleAssets.Add(toAdd);
                                 }
                             }
+                        }
+
                         break;
-                    case 4: //tag category match TODO: REDO
+                    case 4: // tag category match TODO: REDO
                         var handler = new SteamEconomyHandler(_apiKey);
                         var ids = new Dictionary<string, string>
                         {
@@ -171,7 +220,8 @@ namespace CSharpTradeOffers.Trading
                         AssetClassInfo assetClassInfo = handler.GetAssetClassInfo(Convert.ToUInt32(asset.AppId),
                             ids);
 
-                        foreach (Tag tag in assetClassInfo.Tags.Values.Where(tag => tag.Category == valuedItem.TypeObj)) //useless?
+                        // useless?
+                        foreach (Tag tag in assetClassInfo.Tags.Values.Where(tag => tag.Category == valuedItem.TypeObj))
                         {
                             foreach (ValuedWorth valuedWorth in valuedItem.Worth)
                             {
@@ -179,19 +229,25 @@ namespace CSharpTradeOffers.Trading
                                 {
                                     RgInventoryItem rgInventoryItem =
                                         inventoryHandler.FindUnusedItem(valuedWorth).Items.FirstOrDefault(x => !x.InUse);
-                                    if (rgInventoryItem == null) return null;
+                                    if (rgInventoryItem == null)
+                                    {
+                                        return null;
+                                    }
+
                                     CEconAsset toAdd = rgInventoryItem.ToCEconAsset(valuedWorth.AppId.ToString());
                                     inventoryHandler.Inventories[valuedWorth.AppId].MarkAsset(toAdd, true);
                                     compatibleAssets.Add(toAdd);
                                 }
                             }
-                            //locate item in inventory
+                            // locate item in inventory
                         }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("TypeId was outside listed types.");
                 }
             }
+
             return compatibleAssets;
         }
 
@@ -208,7 +264,7 @@ namespace CSharpTradeOffers.Trading
         }
 
         [JsonObject(Title = "Worth")]
-        public class ValuedWorth //TODO: definitely need a better name
+        public class ValuedWorth // TODO: definitely need a better name
         {
             [JsonProperty("name")]
             public string Name { get; set; }
@@ -240,7 +296,7 @@ namespace CSharpTradeOffers.Trading
         }
 
         [JsonObject(Title = "RootObject")]
-        public class ValuedItemsRoot //need a better name?
+        public class ValuedItemsRoot // need a better name?
         {
             [JsonProperty("Items")] // ToDo: Items in camelcase? Was Uppercase before 
             public List<ValuedItem> Items { get; set; }

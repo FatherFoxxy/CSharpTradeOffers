@@ -5,14 +5,13 @@ namespace CSharpTradeOffers.Community
     using Newtonsoft.Json;
 
     public class PrivacySettings
-
     {
         [JsonProperty("type")]
         public const string Type = "profileSettings";
         [JsonProperty("privacySetting")]
         public EPrivacySetting PrivacySetting { get; set; }
         [JsonProperty("commentSetting")]
-        public EPrivacySetting CommentSetting { get; set; } //commentselfonly,commentfriendsonly,commentanyone
+        public EPrivacySetting CommentSetting { get; set; } // commentselfonly,commentfriendsonly,commentanyone
         [JsonProperty("InventoryPrivacySetting")]
         public EPrivacySetting InventoryPrivacySetting { get; set; }
         [JsonProperty("inventoryGiftPrivacy")]

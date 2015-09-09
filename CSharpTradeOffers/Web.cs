@@ -2,11 +2,11 @@
 using System.IO;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
 using System.Net.Cache;
 using System.Threading;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Newtonsoft.Json;
 
 namespace CSharpTradeOffers
 {
@@ -42,11 +42,13 @@ namespace CSharpTradeOffers
         public static HttpWebResponse Request(string url, string method, Dictionary<string, string> data = null,
             CookieContainer cookies = null, bool xHeaders = true, string referer = "")
         {
-            bool isGetMethod = (method.ToLower() == "get");
+            bool isGetMethod = method.ToLower() == "get";
             string dataString = null;
 
             if (data != null)
+            {
                 dataString = "?" + DictionaryToUrlString(data);
+            }
 
             if (isGetMethod && !string.IsNullOrEmpty(dataString))
             {
@@ -72,11 +74,12 @@ namespace CSharpTradeOffers
                     request.Headers.Add("X-Requested-With", "XMLHttpRequest");
                     request.Headers.Add("X-Prototype-Version", "1.7");
                 }
+
                 request.CookieContainer = cookies ?? new CookieContainer();
 
                 if (data != null && !isGetMethod)
                 {
-                    //string dataString = DictionaryToURLString(data);
+                    // string dataString = DictionaryToURLString(data);
                     byte[] dataBytes = Encoding.UTF8.GetBytes(DictionaryToUrlString(data));
                     request.ContentLength = dataBytes.Length;
 
@@ -85,8 +88,10 @@ namespace CSharpTradeOffers
                         reqStream.Write(dataBytes, 0, dataBytes.Length);
                     }
                 }
+
                 return request.GetResponse() as HttpWebResponse;
             }
+
             return null;
         }
 
@@ -138,9 +143,13 @@ namespace CSharpTradeOffers
                 catch (WebException)
                 {
                     if (attempts >= retryCount)
+                    {
                         return null;
+                    }
+
                     attempts++;
                 }
+
                 Thread.Sleep(retryWait);
             }
         }
@@ -164,14 +173,17 @@ namespace CSharpTradeOffers
                 try
                 {
                     return Request(url, method, data, cookies, xHeaders, referer).GetResponseStream();
-
                 }
                 catch (WebException)
                 {
                     if (attempts >= retryCount)
+                    {
                         return null;
+                    }
+
                     attempts++;
                 }
+
                 Thread.Sleep(retryWait);
             }
         }
@@ -198,15 +210,18 @@ namespace CSharpTradeOffers
         /// <returns>A concatenated string of URL arguments.</returns>
         public static string DictionaryToUrlString(Dictionary<string, string> dict)
         {
-            string joined = "";
+            string joined = string.Empty;
             foreach (KeyValuePair<string, string> kvp in dict)
             {
-                if (joined != "")
+                if (joined != string.Empty)
+                {
                     joined += "&";
+                }
 
-                //joined += $"{WebUtility.UrlEncode(kvp.Key)}={WebUtility.UrlEncode(kvp.Value)}";
+                // joined += $"{WebUtility.UrlEncode(kvp.Key)}={WebUtility.UrlEncode(kvp.Value)}";
                 joined += $"{WebUtility.UrlEncode(kvp.Key)}={WebUtility.UrlEncode(kvp.Value)}";
             }
+
             return joined;
         }
 
@@ -218,13 +233,16 @@ namespace CSharpTradeOffers
             Thread.Sleep(2000);
             RsaHelper rsaHelper = new RsaHelper(username, password);
             string encryptedBase64Password = rsaHelper.EncryptPassword();
-            if(encryptedBase64Password == null) return null;
-            
+            if (encryptedBase64Password == null)
+            {
+                return null;
+            }
+
             DoLoginResult loginJson = null;
             CookieCollection cookieCollection;
-            string steamGuardText = "";
-            string steamGuardId = "";
-            string twoFactorText = "";
+            string steamGuardText = string.Empty;
+            string steamGuardId = string.Empty;
+            string twoFactorText = string.Empty;
 
             do
             {
@@ -236,17 +254,19 @@ namespace CSharpTradeOffers
                 var capGid = "-1";
 
                 if (loginJson != null && loginJson.CaptchaNeeded)
+                {
                     capGid = Uri.EscapeDataString(loginJson.CaptchaGid);
+                }
 
                 var data = new Dictionary<string, string>
                 {
                     {"password", encryptedBase64Password},
                     {"username", username},
-                    {"loginfriendlyname", ""},
+                    {"loginfriendlyname", string.Empty},
                     {"rememberlogin", "false"}
                 };
                 // Captcha
-                string capText = "";
+                string capText = string.Empty;
                 if (captcha)
                 {
                     System.Diagnostics.Process.Start("https://steamcommunity.com/public/captcha.php?gid=" + loginJson.CaptchaGid);
@@ -255,8 +275,8 @@ namespace CSharpTradeOffers
                     capText = Console.ReadLine();
                 }
 
-                data.Add("captchagid", captcha ? capGid : "");
-                data.Add("captcha_text", captcha ? capText : "");
+                data.Add("captchagid", captcha ? capGid : string.Empty);
+                data.Add("captcha_text", captcha ? capText : string.Empty);
                 // Captcha end
 
                 // SteamGuard
@@ -271,14 +291,14 @@ namespace CSharpTradeOffers
                 data.Add("emailsteamid", steamGuardId);
                 // SteamGuard end
 
-                //TwoFactor
+                // TwoFactor
                 if (twoFactor)
                 {
                     Console.WriteLine("TwoFactor code required: ");
                     twoFactorText = Console.ReadLine();
                 }
 
-                data.Add("twofactorcode", twoFactor ? twoFactorText : "");
+                data.Add("twofactorcode", twoFactor ? twoFactorText : string.Empty);
 
                 data.Add("rsatimestamp", time);
 
@@ -306,11 +326,17 @@ namespace CSharpTradeOffers
             Account account;
 
             if (loginJson.EmailSteamId != null)
+            {
                 account = new Account(Convert.ToUInt64(loginJson.EmailSteamId));
+            }
             else if (loginJson.TransferParameters?.Steamid != null)
+            {
                 account = new Account(Convert.ToUInt64(loginJson.TransferParameters.Steamid));
+            }
             else
+            {
                 return null;
+            }
 
             if (loginJson.Success)
             {
@@ -333,12 +359,19 @@ namespace CSharpTradeOffers
                             TimezoneOffset = cookie.Value;
                             break;
                     }
-                    if (!cookie.Name.StartsWith("steamMachineAuth")) continue;
+
+                    if (!cookie.Name.StartsWith("steamMachineAuth"))
+                    {
+                        continue;
+                    }
+
                     SteamMachineAuth = cookie.Name + "=" + cookie.Value;
                 }
 
                 if (!string.IsNullOrEmpty(SteamMachineAuth))
+                {
                     account.AddMachineAuthCookies(SteamMachineAuth);
+                }
 
                 SubmitCookies(_cookies);
 
@@ -348,6 +381,7 @@ namespace CSharpTradeOffers
 
                 return account;
             }
+
             Console.WriteLine("SteamWeb Error: " + loginJson.Message);
             return null;
         }
@@ -366,7 +400,11 @@ namespace CSharpTradeOffers
                 catch (WebException)
                 {
                     retries++;
-                    if (retries == retryLimit) throw;
+                    if (retries == retryLimit)
+                    {
+                        throw;
+                    }
+
                     Console.WriteLine("Connection failed... retrying in: " + retryWait + "ms. Retries: " + retries);
                     Thread.Sleep(retryWait);
                 }
@@ -374,7 +412,7 @@ namespace CSharpTradeOffers
             return account;
         }
 
-        static void SubmitCookies(CookieContainer cookies)
+        private static void SubmitCookies(CookieContainer cookies)
         {
             var w = WebRequest.Create("https://steamcommunity.com/") as HttpWebRequest;
 
@@ -406,23 +444,29 @@ namespace CSharpTradeOffers
                 var data = new Dictionary<string, string> { { "username", _username } };
                 string response = Fetch("https://steamcommunity.com/login/getrsakey", "POST", data);
                 GetRsaKey rsaJson = JsonConvert.DeserializeObject<GetRsaKey>(response);
-                if (!rsaJson.Success) return false;
+                if (!rsaJson.Success)
+                {
+                    return false;
+                }
+
                 RsaJson = rsaJson;
                 return true;
             }
 
             public string EncryptPassword()
             {
-                if (!RequestRsaKey()) return null;
+                if (!RequestRsaKey())
+                {
+                    return null;
+                }
 
-                //RSA Encryption
+                // RSA Encryption
                 var rsa = new RSACryptoServiceProvider();
                 var rsaParameters = new RSAParameters
                 {
                     Exponent = HexToByte(RsaJson.PublicKeyExp),
                     Modulus = HexToByte(RsaJson.PublicKeyMod)
                 };
-
 
                 rsa.ImportParameters(rsaParameters);
 
@@ -434,7 +478,9 @@ namespace CSharpTradeOffers
             private static byte[] HexToByte(string hex)
             {
                 if (hex.Length % 2 == 1)
+                {
                     throw new Exception("The binary key cannot have an odd number of digits");
+                }
 
                 byte[] arr = new byte[hex.Length >> 1];
                 int l = hex.Length;
@@ -457,7 +503,6 @@ namespace CSharpTradeOffers
         }
 
         // JSON Classes
-
         public class GetRsaKey
         {
             [JsonProperty("success")]
@@ -469,7 +514,6 @@ namespace CSharpTradeOffers
             [JsonProperty("timestamp")]
             public string TimeStamp { get; set; }
         }
-        
 
         [JsonObject(Title = "RootObject")]
         public class DoLoginResult

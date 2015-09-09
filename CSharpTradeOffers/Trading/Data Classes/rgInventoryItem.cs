@@ -27,7 +27,6 @@ namespace CSharpTradeOffers.Trading
         [JsonProperty("inUse")]
         public bool InUse;
 
-
         /// <param name="appId"></param>
         /// <returns></returns>
         public CEconAsset ToCEconAsset(string appId)

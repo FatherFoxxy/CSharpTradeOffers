@@ -34,7 +34,8 @@ namespace CSharpTradeOffers.Trading
                 {"class_count", ids.Count.ToString()}
             };
             int currentClass = 0;
-            foreach (var key in ids) //make only request per appid at a time
+            // make only request per appid at a time
+            foreach (var key in ids) 
             {
                 data.Add("classid" + currentClass, key.Key);
                 data.Add("instanceid" + currentClass, key.Value);

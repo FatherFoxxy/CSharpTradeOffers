@@ -11,10 +11,12 @@ namespace CSharpTradeOffers.Configuration
         /// The exact name of the command.
         /// </summary>
         public string command_name { get; set; }
+
         /// <summary>
         /// An integer representing a permission level.
         /// </summary>
         public int permission_level { get; set; }
+
         /// <summary>
         /// Turns the Command_Permission into a KeyValuePair
         /// </summary>

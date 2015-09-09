@@ -6,7 +6,6 @@ namespace CSharpTradeOffers.Trading
     [JsonObject(Title = "TradeOffersReceieved")]
     public class CEconTradeOffer
     {
-
         [JsonProperty("tradeofferid")]
         public ulong TradeOfferId { get; set; }
 

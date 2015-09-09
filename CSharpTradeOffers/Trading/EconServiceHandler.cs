@@ -9,9 +9,9 @@ namespace CSharpTradeOffers.Trading
     /// </summary>
     public class EconServiceHandler
     {
-        private readonly string _apiKey;
-
         private const string BaseUrl = "https://api.steampowered.com/IEconService/";
+
+        private readonly string _apiKey;
 
         public EconServiceHandler(string apiKey)
         {
@@ -107,7 +107,7 @@ namespace CSharpTradeOffers.Trading
                 {"serverid", serverid},
                 {"tradeofferid", tradeId.TradeId.ToString()},
                 {"partner", SteamIdOperations.ConvertAccountIdToUlong(partnerId).ToString()},
-                {"captcha", ""}
+                {"captcha", string.Empty}
             };
             return
                 JsonConvert.DeserializeObject<Trade>(
@@ -133,7 +133,7 @@ namespace CSharpTradeOffers.Trading
                 {"serverid", serverid},
                 {"tradeofferid", tradeId.ToString()},
                 {"partner", SteamIdOperations.ConvertAccountIdToUlong(partnerId).ToString()},
-                {"captcha", ""}
+                {"captcha", string.Empty}
             };
             return
                 JsonConvert.DeserializeObject<Trade>(
@@ -163,7 +163,7 @@ namespace CSharpTradeOffers.Trading
                 {"partner", partnerSid.ToString()},
                 {"tradeoffermessage", tradeoffermessage},
                 {"json_tradeoffer", JsonConvert.SerializeObject(offer)},
-                {"captcha", ""},
+                {"captcha", string.Empty},
                 {"trade_offer_create_params", "{}"}
             };
             return JsonConvert.DeserializeObject<SendOfferResponse>(Web.Fetch(url, "POST", data, container, false,
@@ -194,7 +194,7 @@ namespace CSharpTradeOffers.Trading
                 {"partner", partnerSid.ToString()},
                 {"tradeoffermessage", tradeoffermessage},
                 {"json_tradeoffer", JsonConvert.SerializeObject(offer)},
-                {"captcha", ""},
+                {"captcha", string.Empty},
                 {"trade_offer_create_params", "{}"},
                 {"tradeofferid_countered", tradeofferidCountered.ToString()}
             };

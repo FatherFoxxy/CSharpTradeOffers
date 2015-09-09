@@ -11,10 +11,12 @@ namespace CSharpTradeOffers.Configuration
         /// The UInt64 version of a SteamID
         /// </summary>
         public ulong steamid { get; set; }
+
         /// <summary>
         /// The permission level the SteamID has.
         /// </summary>
         public int permission_level { get; set; }
+
         /// <summary>
         /// Turns the Officer into a KeyValuePair
         /// </summary>

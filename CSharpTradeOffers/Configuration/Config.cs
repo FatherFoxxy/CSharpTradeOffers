@@ -49,7 +49,6 @@ namespace CSharpTradeOffers.Configuration
 
                 #region append
                 // BuildMyString.com generated code. Please enjoy your string responsibly.
-
                 var sb = new StringBuilder();
 
                 sb.Append("{\r\n");
@@ -84,6 +83,7 @@ namespace CSharpTradeOffers.Configuration
                 {
                     ConfigDictionaries.Officers_Dict.Add(kvp.Key, kvp.Value);
                 }
+
                 foreach (var kvp in Cfg.CommandPermissions.Select(permission => permission.ToKeyValuePair()))
                 {
                     ConfigDictionaries.Command_Permissions_Dict.Add(kvp.Key, kvp.Value);

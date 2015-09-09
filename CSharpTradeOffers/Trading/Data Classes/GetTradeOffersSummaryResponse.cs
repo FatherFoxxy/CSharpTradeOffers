@@ -5,7 +5,6 @@ namespace CSharpTradeOffers.Trading
     [JsonObject(Title = "Response")]
     public class GetTradeOffersSummaryResponse
     {
-
         [JsonProperty("pending_received_count")]
         public int PendingReceivedCount { get; set; }
 

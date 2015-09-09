@@ -47,14 +47,22 @@ namespace CSharpTradeOffers.Trading
             dynamic inventoryJson = RequestInventory(appId);
 
             if (inventoryJson.success == null)
+            {
                 throw new InventoryException("Inventory request was not successful. 'success' field was null.");
+            }
+
             if (inventoryJson.success != true && inventoryJson.Error != null)
+            {
                 throw new InventoryException(
                     "Inventory request was not successful. 'success' field was false. Error Message: " +
                     inventoryJson.Error.ToString());
+            }
+
             if (inventoryJson.success != true)
+            {
                 throw new InventoryException(
-                    "Inventory request was not successsful. 'success' field was false. Likely cause: No items in inventory.");
+                   "Inventory request was not successsful. 'success' field was false. Likely cause: No items in inventory.");
+            }
 
             dynamic rgInventory = inventoryJson.rgInventory;
             dynamic rgDescriptions = inventoryJson.rgDescriptions;
@@ -79,11 +87,13 @@ namespace CSharpTradeOffers.Trading
                     };
 
                     if (!Items.ContainsKey(description.ClassId))
+                    {
                         Items.Add(description.ClassId, description);
+                    }
                 }
                 catch (NullReferenceException)
                 {
-                    //I can't remember why, but it prevents bad things from happening.
+                    // I can't remember why, but it prevents bad things from happening.
                 }
             }
 
@@ -110,19 +120,27 @@ namespace CSharpTradeOffers.Trading
         /// <returns>A decimal worth in USD.</returns>
         public decimal ItemWorth(Item item)
         {
-            if (item.Tradable != 1) return 0.0m;
+            if (item.Tradable != 1)
+            {
+                return 0.0m;
+            }
+
             var handler = new MarketHandler();
             MarketValue mv = handler.GetPriceOverview(Convert.ToUInt32(item.AppId), item.MarketHashName);
-            return Convert.ToDecimal(mv.MedianPrice.Substring(1)); //skips $ symbol
+            return Convert.ToDecimal(mv.MedianPrice.Substring(1)); // skips $ symbol
         }
-        
+
         /// <param name="tradable"></param>
         /// <param name="appid"></param>
         /// <param name="marketHashName"></param>
         /// <returns></returns>
         public decimal ItemWorth(bool tradable, uint appid, string marketHashName)
         {
-            if (tradable.IntValue() != 1) return 0.0m;
+            if (tradable.IntValue() != 1)
+            {
+                return 0.0m;
+            }
+
             var handler = new MarketHandler();
             MarketValue mv = handler.GetPriceOverview(Convert.ToUInt32(appid), marketHashName);
             return Convert.ToDecimal(mv.MedianPrice.Substring(1));
@@ -134,7 +152,11 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public decimal ItemWorth(int tradable, uint appid, string marketHashName)
         {
-            if (tradable != 1) return 0.0m;
+            if (tradable != 1)
+            {
+                return 0.0m;
+            }
+
             var handler = new MarketHandler();
             MarketValue mv = handler.GetPriceOverview(Convert.ToUInt32(appid), marketHashName);
             return Convert.ToDecimal(mv.MedianPrice.Substring(1));
@@ -163,6 +185,7 @@ namespace CSharpTradeOffers.Trading
                 item.InUse = inUse;
                 return true;
             }
+
             return false;
         }
     }

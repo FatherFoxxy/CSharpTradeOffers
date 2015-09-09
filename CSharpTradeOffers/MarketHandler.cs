@@ -10,7 +10,7 @@ namespace CSharpTradeOffers
     /// </summary>
     public class MarketHandler
     {
-        const string BaseUrl = "https://steamcommunity.com/market/";
+        private const string BaseUrl = "https://steamcommunity.com/market/";
         
         /// <summary>
         /// Sets the container to contain a MarketEligibility cookie. Required before trading.
