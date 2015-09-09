@@ -12,25 +12,23 @@ namespace CSharpTradeOffers.Trading
     /// </summary>
     public class ItemValueHandler
     {
-        private readonly string _path;
+        private readonly string path;
 
-        private readonly string _apiKey;
+        private readonly string apiKey;
 
-        public static ValuedItemsRoot ValuedItems;
+        public static ValuedItemsRoot ValuedItems { get; set; }
 
         public ItemValueHandler(string path, string apiKey)
         {
-            _path = path;
-            _apiKey = apiKey;
+            this.path = path;
+            this.apiKey = apiKey;
 
-            if (File.Exists(_path))
+            if (File.Exists(this.path))
             {
                 throw new Exception("Path not found.");
             }
 
-            File.Create(_path).Close();
-
-            #region append
+            File.Create(this.path).Close();
 
             // BuildMyString.com generated code. Please enjoy your string responsibly.
             var sb = new StringBuilder();
@@ -57,14 +55,12 @@ namespace CSharpTradeOffers.Trading
             sb.Append("  ]\r\n");
             sb.Append("}\r\n");
 
-            #endregion
-
-            File.WriteAllText(_path, sb.ToString());
+            File.WriteAllText(this.path, sb.ToString());
         }
 
         public void RefreshValues()
         {
-            ValuedItems = JsonConvert.DeserializeObject<ValuedItemsRoot>(File.ReadAllText(_path));
+            ValuedItems = JsonConvert.DeserializeObject<ValuedItemsRoot>(File.ReadAllText(this.path));
         }
 
         public TradeOffer CreateCompatibleOffer(CEconTradeOffer offer, ref InventoryHandler myInventoryHandler, ref InventoryHandler theirInventoryHandler)
@@ -118,7 +114,7 @@ namespace CSharpTradeOffers.Trading
                 switch (valuedItem.TypeId)
                 {
                     case 0: // exact match
-                        if (asset.GetMarketHashName(_apiKey) != valuedItem.TypeObj)
+                        if (asset.GetMarketHashName(this.apiKey) != valuedItem.TypeObj)
                         {
                             break;
                         }
@@ -142,7 +138,7 @@ namespace CSharpTradeOffers.Trading
 
                         break;
                     case 1: // contains match
-                        if (asset.GetMarketHashName(_apiKey).Contains(valuedItem.TypeObj))
+                        if (asset.GetMarketHashName(this.apiKey).Contains(valuedItem.TypeObj))
                         {
                             break;
                         }
@@ -166,7 +162,7 @@ namespace CSharpTradeOffers.Trading
 
                         break;
                     case 2: // starts with match
-                        if (asset.GetMarketHashName(_apiKey).StartsWith(valuedItem.TypeObj))
+                        if (asset.GetMarketHashName(this.apiKey).StartsWith(valuedItem.TypeObj))
                         {
                             break;
                         }
@@ -212,13 +208,12 @@ namespace CSharpTradeOffers.Trading
 
                         break;
                     case 4: // tag category match TODO: REDO
-                        var handler = new SteamEconomyHandler(_apiKey);
+                        var handler = new SteamEconomyHandler(this.apiKey);
                         var ids = new Dictionary<string, string>
                         {
                             {asset.ClassId, asset.InstanceId}
                         };
-                        AssetClassInfo assetClassInfo = handler.GetAssetClassInfo(Convert.ToUInt32(asset.AppId),
-                            ids);
+                        AssetClassInfo assetClassInfo = handler.GetAssetClassInfo(Convert.ToUInt32(asset.AppId), ids);
 
                         // useless?
                         foreach (Tag tag in assetClassInfo.Tags.Values.Where(tag => tag.Category == valuedItem.TypeObj))
@@ -239,7 +234,7 @@ namespace CSharpTradeOffers.Trading
                                     compatibleAssets.Add(toAdd);
                                 }
                             }
-                            // locate item in inventory
+                            //// locate item in inventory
                         }
 
                         break;

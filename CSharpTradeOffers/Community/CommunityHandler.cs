@@ -147,7 +147,6 @@ namespace CSharpTradeOffers.Community
         /// <returns>An InviteResponse object.</returns>
         public InviteResponse InviteUserToGroup(ulong steamId, bool json, ulong group, CookieContainer authContainer)
         {
-            const string url = "https://steamcommunity.com/actions/GroupInvite/";
             string sessionid = (from Cookie cookie in authContainer.GetCookies(new Uri("https://steamcommunity.com"))
                                 where cookie.Name == "sessionid"
                                 select cookie.Value).FirstOrDefault();
@@ -159,7 +158,7 @@ namespace CSharpTradeOffers.Community
                 {"sessionID", sessionid},
                 {"invitee", steamId.ToString()}
             };
-            return JsonConvert.DeserializeObject<InviteResponse>(Web.Fetch(url, "POST", data, authContainer));
+            return JsonConvert.DeserializeObject<InviteResponse>(Web.Fetch("https://steamcommunity.com/actions/GroupInvite/", "POST", data, authContainer));
         }
 
         /// <summary>
@@ -172,7 +171,6 @@ namespace CSharpTradeOffers.Community
         /// <returns>A MultiInviteResponse object.</returns>
         public MultiInviteResponse InviteUsersToGroup(ulong[] steamIds, bool json, ulong group, CookieContainer authContainer)
         {
-            const string url = "https://steamcommunity.com/actions/GroupInvite/";
             string sessionid = (from Cookie cookie in authContainer.GetCookies(new Uri("https://steamcommunity.com"))
                                 where cookie.Name == "sessionid"
                                 select cookie.Value).FirstOrDefault();
@@ -184,7 +182,7 @@ namespace CSharpTradeOffers.Community
                 {"sessionID", sessionid},
                 {"invitee_list", ToJArray(steamIds)}
             };
-            return JsonConvert.DeserializeObject<MultiInviteResponse>(Web.Fetch(url, "POST", data, authContainer));
+            return JsonConvert.DeserializeObject<MultiInviteResponse>(Web.Fetch("https://steamcommunity.com/actions/GroupInvite/", "POST", data, authContainer));
         }
 
         /// <summary>
@@ -194,8 +192,7 @@ namespace CSharpTradeOffers.Community
         /// <returns></returns>
         public string ToJArray(ulong[] items)
         {
-            const string formatter = "\"{0}\",";
-            string jArray = items.Aggregate("[", (current, item) => current + string.Format(formatter, item.ToString()));
+            string jArray = items.Aggregate("[", (current, item) => current + $"\"{item.ToString()}\",");
             jArray = jArray.Substring(0, jArray.Length - 1);
             jArray += "]";
             return jArray;
@@ -208,11 +205,11 @@ namespace CSharpTradeOffers.Community
         /// <returns>A memberList object.</returns>
         public MemberList RequestMemberList(ulong groupId)
         {
-            const string url = "http://steamcommunity.com/gid/{0}/memberslistxml/?xml=1";
 
             return
                 (MemberList)
-                    new XmlSerializer(typeof(MemberList)).Deserialize(Web.FetchStream(string.Format(url, groupId),
+                    new XmlSerializer(typeof(MemberList)).Deserialize(Web.FetchStream(
+                        $"http://steamcommunity.com/gid/{groupId}/memberslistxml/?xml=1",
                         "GET"));
         }
 
@@ -223,11 +220,10 @@ namespace CSharpTradeOffers.Community
         /// <returns>A memberList object.</returns>
         public MemberList RequestMemberList(string groupName)
         {
-            const string url = "http://steamcommunity.com/groups/{0}/memberslistxml/?xml=1";
-
             return
                 (MemberList)
-                    new XmlSerializer(typeof(MemberList)).Deserialize(Web.FetchStream(string.Format(url, groupName),
+                    new XmlSerializer(typeof(MemberList)).Deserialize(Web.FetchStream(
+                        $"http://steamcommunity.com/groups/{groupName}/memberslistxml/?xml=1",
                         "GET"));
         }
 
@@ -241,7 +237,6 @@ namespace CSharpTradeOffers.Community
         public List<MemberList> RequestAllMemberLists(ulong groupId, int retryWait = 1000, int retryCount = 10)
         {
             var membersList = new List<MemberList>();
-            const string url = "http://steamcommunity.com/gid/{0}/memberslistxml/?xml=1&p={1}";
 
             ulong count = 1;
             ulong totalPages = 1;
@@ -249,7 +244,7 @@ namespace CSharpTradeOffers.Community
 
             do
             {
-                string temp = string.Format(url, groupId, count);
+                string temp = $"http://steamcommunity.com/gid/{groupId}/memberslistxml/?xml=1&p={count}";
 
                 try
                 {
@@ -290,14 +285,13 @@ namespace CSharpTradeOffers.Community
         {
             var membersList = new List<MemberList>();
             groupName = groupName.Replace(" ", string.Empty);
-            const string url = "http://steamcommunity.com/groups/{0}/memberslistxml/?xml=1&p={1}";
 
             ulong count = 1;
             ulong totalPages = 1;
             bool firstRequest = false;
             do
             {
-                string temp = string.Format(url, groupName, count);
+                string temp = $"http://steamcommunity.com/groups/{groupName}/memberslistxml/?xml=1&p={count}";
 
                 try
                 {

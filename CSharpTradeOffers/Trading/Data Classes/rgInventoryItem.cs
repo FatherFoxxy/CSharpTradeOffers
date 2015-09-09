@@ -23,9 +23,9 @@ namespace CSharpTradeOffers.Trading
         [JsonProperty("pos")]
         public ulong Pos { get; set; }
 
-        [JsonIgnore] 
+        [JsonIgnore]
         [JsonProperty("inUse")]
-        public bool InUse;
+        public bool InUse { get; set; }
 
         /// <param name="appId"></param>
         /// <returns></returns>

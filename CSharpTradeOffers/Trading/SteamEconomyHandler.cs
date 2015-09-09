@@ -10,11 +10,11 @@ namespace CSharpTradeOffers.Trading
     public class SteamEconomyHandler
     {
         private const string BaseUrl = "https://api.steampowered.com/ISteamEconomy/";
-        private readonly string _apiKey;
+        private readonly string apiKey;
 
         public SteamEconomyHandler(string apiKey)
         {
-            _apiKey = apiKey;
+            this.apiKey = apiKey;
         }
 
         /// <summary>
@@ -26,15 +26,14 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public AssetClassInfo GetAssetClassInfo(uint appid, Dictionary<string, string> ids)
         {
-            const string url = BaseUrl + "GetAssetClassInfo/v0001/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"appid", appid.ToString()},
                 {"class_count", ids.Count.ToString()}
             };
             int currentClass = 0;
-            // make only request per appid at a time
+            //// make only request per appid at a time
             foreach (var key in ids) 
             {
                 data.Add("classid" + currentClass, key.Key);
@@ -42,7 +41,7 @@ namespace CSharpTradeOffers.Trading
                 currentClass++;
             }
 
-            dynamic dynamicinfo = JsonConvert.DeserializeObject<dynamic>(Web.Fetch(url, "GET", data, null, false)).result;
+            dynamic dynamicinfo = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Web.Fetch(BaseUrl + "GetAssetClassInfo/v0001/", "GET", data, null, false)).result;
 
             Dictionary<string, dynamic> desrDictionary =
                 JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(dynamicinfo.ToString());
@@ -61,16 +60,15 @@ namespace CSharpTradeOffers.Trading
         /// <returns>A GetAssetPricesResponse object.</returns>
         public GetAssetPricesResponse GetAssetPrices(uint appId, string currency = "", string language = "en")
         {
-            const string url = BaseUrl + "GetAssetPrices/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"appid", appId.ToString()},
                 {"currency", currency},
                 {"language", language}
             };
             return
-                JsonConvert.DeserializeObject<GetAssetPricesBaseResponse>(Web.Fetch(url, "GET", data, null, false))
+                JsonConvert.DeserializeObject<GetAssetPricesBaseResponse>(Web.Fetch(BaseUrl + "GetAssetPrices/v1/", "GET", data, null, false))
                     .Result;
         }
     }

@@ -48,7 +48,7 @@ namespace CSharpTradeOffers.Trading
         /// List of rgInventoryItem, this should be used for whenever you need to interact with a specific item rather than all of them.
         /// </summary>
         [JsonProperty("items")]
-        public List<RgInventoryItem> Items = new List<RgInventoryItem>();
+        public List<RgInventoryItem> Items { get; } = new List<RgInventoryItem>();
 
         /// <summary>
         /// Market worth of the item.

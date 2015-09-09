@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CSharpTradeOffers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CSharpTradeOffers_Tests
 {
@@ -61,6 +61,5 @@ namespace CSharpTradeOffers_Tests
             uint actual = SteamIdOperations.ConvertSteamIdToAccountId(input);
             Assert.AreEqual(expected, actual);
         }
-        //100049904
     }
 }

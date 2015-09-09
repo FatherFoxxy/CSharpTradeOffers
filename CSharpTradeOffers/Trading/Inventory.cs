@@ -7,7 +7,7 @@ namespace CSharpTradeOffers.Trading
 {
     public class Inventory
     {
-        private readonly ulong _steamId;
+        private readonly ulong steamId;
 
         /// <summary>
         /// Class constructor, automatically initializes inventory.
@@ -16,14 +16,14 @@ namespace CSharpTradeOffers.Trading
         /// <param name="appId">App ID of the inventory.</param>
         public Inventory(ulong steamId, uint appId)
         {
-            _steamId = steamId;
+            this.steamId = steamId;
             InitializeInventory(appId);
         }
 
         /// <summary>
         /// String is the ClassId linking to an Item object.
         /// </summary>
-        public Dictionary<string, Item> Items = new Dictionary<string, Item>();
+        public Dictionary<string, Item> Items { get; } = new Dictionary<string, Item>();
 
         /// <summary>
         /// Requests the inventory for the specified steamId and appId.
@@ -33,7 +33,7 @@ namespace CSharpTradeOffers.Trading
         /// <returns>Returns a dynamic JSON object of the inventory to request.</returns>
         private dynamic RequestInventory(uint appId)
         {
-            string url = "https://steamcommunity.com/profiles/" + _steamId + "/inventory/json/" + appId + "/2/";
+            string url = "https://steamcommunity.com/profiles/" + this.steamId + "/inventory/json/" + appId + "/2/";
             return JsonConvert.DeserializeObject<dynamic>(Web.Fetch(url, "GET", null, null, false));
         }
 
@@ -81,14 +81,15 @@ namespace CSharpTradeOffers.Trading
                         Marketable = descriptionObj.marketable,
                         Tradable = descriptionObj.tradable,
                         Worth =
-                            ItemWorth(Convert.ToInt32(descriptionObj.tradable),
+                            ItemWorth(
+                                Convert.ToInt32(descriptionObj.tradable),
                                 Convert.ToUInt32(descriptionObj.appid),
                                 descriptionObj.market_hash_name.ToString())
                     };
 
-                    if (!Items.ContainsKey(description.ClassId))
+                    if (!this.Items.ContainsKey(description.ClassId))
                     {
-                        Items.Add(description.ClassId, description);
+                        this.Items.Add(description.ClassId, description);
                     }
                 }
                 catch (NullReferenceException)
@@ -109,7 +110,7 @@ namespace CSharpTradeOffers.Trading
                     InstanceId = item.instanceid,
                     Pos = item.pos
                 };
-                Items[inventoryItem.ClassId.ToString()].Items.Add(inventoryItem);
+                this.Items[inventoryItem.ClassId.ToString()].Items.Add(inventoryItem);
             }
         }
 
@@ -169,7 +170,7 @@ namespace CSharpTradeOffers.Trading
         /// <returns>An rgInventoryItem that is not marked in use.</returns>
         public RgInventoryItem FindAvailableAsset(string classid)
         {
-            return Items[classid].Items.FirstOrDefault(item => !item.InUse);
+            return this.Items[classid].Items.FirstOrDefault(item => !item.InUse);
         }
 
         /// <summary>
@@ -180,7 +181,7 @@ namespace CSharpTradeOffers.Trading
         /// <returns>True if successful, false if not.</returns>
         public bool MarkAsset(CEconAsset asset, bool inUse)
         {
-            foreach (RgInventoryItem item in Items[asset.ClassId].Items.Where(item => item.Id.ToString() == asset.AssetId))
+            foreach (RgInventoryItem item in this.Items[asset.ClassId].Items.Where(item => item.Id.ToString() == asset.AssetId))
             {
                 item.InUse = inUse;
                 return true;

@@ -9,14 +9,14 @@ namespace CSharpTradeOffers.Trading
     /// </summary>
     public class InventoryHandler
     {
-        private readonly ulong _steamId;
+        private readonly ulong steamId;
 
-        private readonly string _apiKey;
+        private readonly string apiKey;
 
         public InventoryHandler(ulong steamId, string apiKey)
         {
-            _steamId = steamId;
-            _apiKey = apiKey;
+            this.steamId = steamId;
+            this.apiKey = apiKey;
             Inventories = new Dictionary<uint, Inventory>();
         }
 
@@ -27,7 +27,7 @@ namespace CSharpTradeOffers.Trading
             Inventories.Clear();
             foreach (uint appid in appids.Where(appid => !Inventories.ContainsKey(appid)))
             {
-                Inventories.Add(appid, new Inventory(_steamId, appid));
+                Inventories.Add(appid, new Inventory(this.steamId, appid));
             }
         }
 
@@ -88,7 +88,7 @@ namespace CSharpTradeOffers.Trading
 
                     return null;
                 case 4: // tags
-                    var handler = new SteamEconomyHandler(_apiKey);
+                    var handler = new SteamEconomyHandler(this.apiKey);
                     foreach (var item in inv.Items.Values)
                     {
                         Dictionary<string, string> classid = new Dictionary<string, string>

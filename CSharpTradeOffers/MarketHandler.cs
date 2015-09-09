@@ -19,9 +19,8 @@ namespace CSharpTradeOffers
         /// <param name="container">The bot CookieContainer</param>
         public void EligibilityCheck(ulong steamId, CookieContainer container)
         {
-            const string url = BaseUrl + "eligibilitycheck/";
             var data = new Dictionary<string, string> { { "goto", "/profiles/" + steamId + "/tradeoffers/" } };
-            Web.Fetch(url, "GET", data, container, false);
+            Web.Fetch(BaseUrl + "eligibilitycheck/", "GET", data, container, false);
         }
 
         /// <summary>
@@ -34,7 +33,6 @@ namespace CSharpTradeOffers
         /// <returns>A MarketValue object containing the data.</returns>
         public MarketValue GetPriceOverview(uint appId, string marketHashName, string country = "US", string currency = "1")
         {
-            const string url = BaseUrl + "priceoverview/";
             var data = new Dictionary<string, string>
             {
                 {"country", country},
@@ -42,7 +40,7 @@ namespace CSharpTradeOffers
                 {"appid", appId.ToString()},
                 {"market_hash_name", marketHashName}
             };
-            return JsonConvert.DeserializeObject<MarketValue>(Web.Fetch(url, "GET", data, null, false));
+            return JsonConvert.DeserializeObject<MarketValue>(Web.Fetch(BaseUrl + "priceoverview/", "GET", data, null, false));
         }
     }
 }

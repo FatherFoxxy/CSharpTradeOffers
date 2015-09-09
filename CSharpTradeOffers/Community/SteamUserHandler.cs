@@ -10,11 +10,11 @@ namespace CSharpTradeOffers.Community
     public class SteamUserHandler
     {
         private const string BaseUrl = "http://api.steampowered.com/ISteamUser/";
-        private readonly string _apiKey;
+        private readonly string apiKey;
 
         public SteamUserHandler(string apiKey)
         {
-            _apiKey = apiKey;
+            this.apiKey = apiKey;
         }
 
         /// <summary>
@@ -27,15 +27,14 @@ namespace CSharpTradeOffers.Community
         /// <returns>Null upon failure, otherwise a list of Friend objects.</returns>
         public List<Friend> GetFriendList(ulong steamId, string relationship = "" )
         {
-            const string url = BaseUrl + "GetFriendList/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"steamid", steamId.ToString()},
                 {"relationship", relationship}
             };
             return
-                JsonConvert.DeserializeObject<GetFriendListResult>(Web.Fetch(url, "GET", data, null, false))
+                JsonConvert.DeserializeObject<GetFriendListResult>(Web.Fetch(BaseUrl + "GetFriendList/v1/", "GET", data, null, false))
                     .Friendslist.Friends;
         }
 
@@ -46,14 +45,13 @@ namespace CSharpTradeOffers.Community
         /// <returns></returns>
         public List<PlayerBans> GetPlayerBans(List<ulong> playersBansToRequest)
         {
-            const string url = BaseUrl + "GetPlayerBans/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"steamids", CommaDelimit(playersBansToRequest)}
             };
             return
-                JsonConvert.DeserializeObject<GetPlayerBansResult>(Web.Fetch(url, "GET", data, null, false)).PlayerBans;
+                JsonConvert.DeserializeObject<GetPlayerBansResult>(Web.Fetch(BaseUrl + "GetPlayerBans/v1/", "GET", data, null, false)).PlayerBans;
         }
 
         /// <summary>
@@ -63,14 +61,13 @@ namespace CSharpTradeOffers.Community
         /// <returns>A list of PlayerSummary objects.</returns>
         public List<PlayerSummary> GetPlayerSummariesV2(List<ulong> playerSummariesToRequest)
         {
-            const string url = BaseUrl + "GetPlayerSummaries/v2/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"steamids", CommaDelimit(playerSummariesToRequest)}
             };
             return
-                JsonConvert.DeserializeObject<GetPlayerSummariesV2Result>(Web.Fetch(url, "GET", data, null, false))
+                JsonConvert.DeserializeObject<GetPlayerSummariesV2Result>(Web.Fetch(BaseUrl + "GetPlayerSummaries/v2/", "GET", data, null, false))
                     .Response.PlayersSummaries;
         }
 
@@ -81,14 +78,13 @@ namespace CSharpTradeOffers.Community
         /// <returns>A GetUserGroupListResult object that contains a list of group ids.</returns>
         public GetUserGroupListResult GetUserGroupList(ulong steamId)
         {
-            const string url = BaseUrl + "GetUserGroupList/1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"steamid", steamId.ToString()}
             };
             return
-                JsonConvert.DeserializeObject<GetUserGroupListBaseResult>(Web.Fetch(url, "GET", data, null, false))
+                JsonConvert.DeserializeObject<GetUserGroupListBaseResult>(Web.Fetch(BaseUrl + "GetUserGroupList/1/", "GET", data, null, false))
                     .Result;
         }
 
@@ -104,15 +100,14 @@ namespace CSharpTradeOffers.Community
         /// <returns>A ResolveVanityUrlResult object.</returns>
         public ResolveVanityUrlResult ResolveVanityUrl(string vanityUrl, int urlType = 1)
         {
-            const string url = BaseUrl + "ResolveVanityURL/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"vanityurl", vanityUrl},
                 {"url_type", urlType.ToString()}
             };
             return
-                JsonConvert.DeserializeObject<ResolveVanityUrlBaseResult>(Web.Fetch(url, "GET", data, null, false))
+                JsonConvert.DeserializeObject<ResolveVanityUrlBaseResult>(Web.Fetch(BaseUrl + "ResolveVanityURL/v1/", "GET", data, null, false))
                     .Response;
         }
 

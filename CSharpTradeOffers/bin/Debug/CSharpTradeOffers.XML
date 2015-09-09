@@ -18,7 +18,7 @@
         <member name="P:CSharpTradeOffers.Community.MemberList.GroupDetails">
             <remarks/>
         </member>
-        <member name="P:CSharpTradeOffers.Community.MemberList.memberCount">
+        <member name="P:CSharpTradeOffers.Community.MemberList.MemberCount">
             <remarks/>
         </member>
         <member name="P:CSharpTradeOffers.Community.MemberList.TotalPages">
@@ -30,7 +30,7 @@
         <member name="P:CSharpTradeOffers.Community.MemberList.StartingMember">
             <remarks/>
         </member>
-        <member name="P:CSharpTradeOffers.Community.MemberList.members">
+        <member name="P:CSharpTradeOffers.Community.MemberList.Members">
             <remarks/>
         </member>
         <member name="T:CSharpTradeOffers.Community.MemberListGroupDetails">
@@ -121,7 +121,7 @@
             </summary>
             <param name="steamId">SteamId64 of the friend to remove.</param>
             <param name="authContainer">Auth container of the user.</param>
-            <returns>Bollean representing the successs of the function.</returns>
+            <returns>Boolean representing the successs of the function.</returns>
         </member>
         <member name="M:CSharpTradeOffers.Community.CommunityHandler.InviteUserToGroup(System.UInt64,System.Boolean,System.UInt64,System.Net.CookieContainer)">
             <summary>
@@ -246,22 +246,22 @@
             </param>
             <returns>A ResolveVanityUrlResult object.</returns>
         </member>
-        <member name="T:CSharpTradeOffers.Configuration.Command_Permission">
+        <member name="T:CSharpTradeOffers.Configuration.CommandPermission">
             <summary>
             Generic command permission class.
             </summary>
         </member>
-        <member name="P:CSharpTradeOffers.Configuration.Command_Permission.command_name">
+        <member name="P:CSharpTradeOffers.Configuration.CommandPermission.CommandName">
             <summary>
             The exact name of the command.
             </summary>
         </member>
-        <member name="P:CSharpTradeOffers.Configuration.Command_Permission.permission_level">
+        <member name="P:CSharpTradeOffers.Configuration.CommandPermission.PermissionLevel">
             <summary>
             An integer representing a permission level.
             </summary>
         </member>
-        <member name="M:CSharpTradeOffers.Configuration.Command_Permission.ToKeyValuePair">
+        <member name="M:CSharpTradeOffers.Configuration.CommandPermission.ToKeyValuePair">
             <summary>
             Turns the Command_Permission into a KeyValuePair
             </summary>
@@ -272,12 +272,12 @@
             Class containing Dictionary versions of Offer/CommandPermission
             </summary>
         </member>
-        <member name="F:CSharpTradeOffers.Configuration.Dictionaries.Officers_Dict">
+        <member name="P:CSharpTradeOffers.Configuration.Dictionaries.OfficersDict">
             <summary>
             
             </summary>
         </member>
-        <member name="F:CSharpTradeOffers.Configuration.Dictionaries.Command_Permissions_Dict">
+        <member name="P:CSharpTradeOffers.Configuration.Dictionaries.CommandPermissionsDict">
             <summary>
             
             </summary>
@@ -297,12 +297,12 @@
             Generic officer class.
             </summary>
         </member>
-        <member name="P:CSharpTradeOffers.Configuration.Officer.steamid">
+        <member name="P:CSharpTradeOffers.Configuration.Officer.SteamId">
             <summary>
             The UInt64 version of a SteamID
             </summary>
         </member>
-        <member name="P:CSharpTradeOffers.Configuration.Officer.permission_level">
+        <member name="P:CSharpTradeOffers.Configuration.Officer.PermissionLevel">
             <summary>
             The permission level the SteamID has.
             </summary>
@@ -389,12 +389,12 @@
             Generic config file
             </summary>
         </member>
-        <member name="F:CSharpTradeOffers.Configuration.Config.Cfg">
+        <member name="P:CSharpTradeOffers.Configuration.Config.Cfg">
             <summary>
             The meat of the config
             </summary>
         </member>
-        <member name="F:CSharpTradeOffers.Configuration.Config.ConfigDictionaries">
+        <member name="P:CSharpTradeOffers.Configuration.Config.ConfigDictionaries">
             <summary>
             Dictionary forms of the lists contained in for easy access/use
             </summary>
@@ -407,7 +407,7 @@
         </member>
         <member name="M:CSharpTradeOffers.Configuration.Config.#ctor(System.String)">
             <summary>
-            Initializes the Config and the path to use
+            the Config and the path to use
             </summary>
             <param name="path"></param>
         </member>
@@ -519,7 +519,7 @@
             <param name="steamId">steamId64 of the inventory.</param>
             <param name="appId">App ID of the inventory.</param>
         </member>
-        <member name="F:CSharpTradeOffers.Trading.Inventory.Items">
+        <member name="P:CSharpTradeOffers.Trading.Inventory.Items">
             <summary>
             String is the ClassId linking to an Item object.
             </summary>
@@ -673,7 +673,7 @@
             0 = not commodity, 1 = commodity
             </summary>
         </member>
-        <member name="F:CSharpTradeOffers.Trading.Item.Items">
+        <member name="P:CSharpTradeOffers.Trading.Item.Items">
             <summary>
             List of rgInventoryItem, this should be used for whenever you need to interact with a specific item rather than all of them.
             </summary>
@@ -902,6 +902,7 @@
             <summary>
             Executes the login by using the Steam Website.
             </summary> 
+            <returns>Return an Account</returns>
         </member>
     </members>
 </doc>

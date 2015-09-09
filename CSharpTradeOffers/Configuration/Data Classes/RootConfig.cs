@@ -63,7 +63,7 @@ namespace CSharpTradeOffers.Configuration
         /// <summary>
         /// List of Command_Permission objects.
         /// </summary>
-        public List<Command_Permission> CommandPermissions { get; set; }
+        public List<CommandPermission> CommandPermissions { get; set; }
 
         /// <summary>
         /// Inventories to create on load, refreshInventories method from Inventory handler also uses these.
