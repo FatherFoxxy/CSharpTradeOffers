@@ -3,10 +3,10 @@ using System.Xml.Serialization;
 namespace CSharpTradeOffers.Community
 {
     /// <remarks/>
-    [System.Serializable()]
+    [System.Serializable]
     [System.ComponentModel.DesignerCategory("code")]
     [XmlType(AnonymousType = true)]
-    [XmlRoot(Namespace = "", IsNullable = false,ElementName = "memberList")]
+    [XmlRoot(Namespace = "", IsNullable = false, ElementName = "memberList")]
     public class MemberList
     {
         /// <remarks/>
@@ -19,7 +19,7 @@ namespace CSharpTradeOffers.Community
 
         /// <remarks/>
         [XmlElement("memberCount")]
-        public ulong memberCount { get; set; }
+        public ulong MemberCount { get; set; }
 
         /// <remarks/>
         [XmlElement("totalPages")]
@@ -35,6 +35,6 @@ namespace CSharpTradeOffers.Community
 
         /// <remarks/>
         [XmlArrayItem("steamID64", IsNullable = false)]
-        public ulong[] members { get; set; }
+        public ulong[] Members { get; set; }
     }
 }

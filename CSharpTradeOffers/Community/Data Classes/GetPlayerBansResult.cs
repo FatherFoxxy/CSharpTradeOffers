@@ -7,6 +7,6 @@ namespace CSharpTradeOffers.Community
     public class GetPlayerBansResult
     {
         [JsonProperty("playersbans")]
-        public List<PlayerBans> PlayerBans { get; set; } //better name?
+        public List<PlayerBans> PlayerBans { get; set; } // better name?
     }
 }

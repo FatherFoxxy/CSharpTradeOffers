@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
-using Newtonsoft.Json;
 using System.Net.Cache;
-using System.Threading;
-using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using Newtonsoft.Json;
 
 namespace CSharpTradeOffers
 {
@@ -27,7 +27,7 @@ namespace CSharpTradeOffers
 
         public static string TimezoneOffset { get; private set; }
 
-        private static CookieContainer _cookies = new CookieContainer();
+        private static CookieContainer cookies = new CookieContainer();
 
         /// <summary>
         /// Fetch calls this method.
@@ -39,14 +39,17 @@ namespace CSharpTradeOffers
         /// <param name="xHeaders">Special parameter, should only be used with requests that need "X-Requested-With: XMLHttpRequest" and "X-Prototype-Version: 1.7"</param>
         /// <param name="referer">Sets the referrer for the request.</param>
         /// <returns>An HttpWebResponse object from the requested URL.</returns>
-        public static HttpWebResponse Request(string url, string method, Dictionary<string, string> data = null,
+        public static HttpWebResponse Request(
+            string url, string method, Dictionary<string, string> data = null,
             CookieContainer cookies = null, bool xHeaders = true, string referer = "")
         {
-            bool isGetMethod = (method.ToLower() == "get");
+            bool isGetMethod = method.ToLower() == "get";
             string dataString = null;
 
             if (data != null)
+            {
                 dataString = "?" + DictionaryToUrlString(data);
+            }
 
             if (isGetMethod && !string.IsNullOrEmpty(dataString))
             {
@@ -72,11 +75,12 @@ namespace CSharpTradeOffers
                     request.Headers.Add("X-Requested-With", "XMLHttpRequest");
                     request.Headers.Add("X-Prototype-Version", "1.7");
                 }
+
                 request.CookieContainer = cookies ?? new CookieContainer();
 
                 if (data != null && !isGetMethod)
                 {
-                    //string dataString = DictionaryToURLString(data);
+                    // string dataString = DictionaryToURLString(data);
                     byte[] dataBytes = Encoding.UTF8.GetBytes(DictionaryToUrlString(data));
                     request.ContentLength = dataBytes.Length;
 
@@ -85,8 +89,10 @@ namespace CSharpTradeOffers
                         reqStream.Write(dataBytes, 0, dataBytes.Length);
                     }
                 }
+
                 return request.GetResponse() as HttpWebResponse;
             }
+
             return null;
         }
 
@@ -120,7 +126,8 @@ namespace CSharpTradeOffers
         /// <param name="xHeaders">Special parameter, should only be used with requests that need "X-Requested-With: XMLHttpRequest" and "X-Prototype-Version: 1.7"</param>
         /// <param name="referer">Sets the referrer for the request.</param>
         /// <returns>A string from the response stream.</returns>
-        public static string RetryFetch(int retryWait, int retryCount, string url, string method, Dictionary<string, string> data = null,
+        public static string RetryFetch(
+            int retryWait, int retryCount, string url, string method, Dictionary<string, string> data = null,
             CookieContainer cookies = null, bool xHeaders = true, string referer = "")
         {
             int attempts = 0;
@@ -138,9 +145,13 @@ namespace CSharpTradeOffers
                 catch (WebException)
                 {
                     if (attempts >= retryCount)
+                    {
                         return null;
+                    }
+
                     attempts++;
                 }
+
                 Thread.Sleep(retryWait);
             }
         }
@@ -155,7 +166,8 @@ namespace CSharpTradeOffers
         /// <param name="xHeaders">Special parameter, should only be used with requests that need "X-Requested-With: XMLHttpRequest" and "X-Prototype-Version: 1.7"</param>
         /// <param name="referer">Sets the referrer for the request.</param>
         /// <returns>A string from the response stream.</returns>
-        public static Stream RetryFetchStream(int retryWait, int retryCount, string url, string method, Dictionary<string, string> data = null,
+        public static Stream RetryFetchStream(
+            int retryWait, int retryCount, string url, string method, Dictionary<string, string> data = null,
             CookieContainer cookies = null, bool xHeaders = true, string referer = "")
         {
             int attempts = 0;
@@ -164,14 +176,17 @@ namespace CSharpTradeOffers
                 try
                 {
                     return Request(url, method, data, cookies, xHeaders, referer).GetResponseStream();
-
                 }
                 catch (WebException)
                 {
                     if (attempts >= retryCount)
+                    {
                         return null;
+                    }
+
                     attempts++;
                 }
+
                 Thread.Sleep(retryWait);
             }
         }
@@ -198,33 +213,40 @@ namespace CSharpTradeOffers
         /// <returns>A concatenated string of URL arguments.</returns>
         public static string DictionaryToUrlString(Dictionary<string, string> dict)
         {
-            string joined = "";
+            string joined = string.Empty;
             foreach (KeyValuePair<string, string> kvp in dict)
             {
-                if (joined != "")
+                if (joined != string.Empty)
+                {
                     joined += "&";
+                }
 
-                //joined += $"{WebUtility.UrlEncode(kvp.Key)}={WebUtility.UrlEncode(kvp.Value)}";
+                // joined += $"{WebUtility.UrlEncode(kvp.Key)}={WebUtility.UrlEncode(kvp.Value)}";
                 joined += $"{WebUtility.UrlEncode(kvp.Key)}={WebUtility.UrlEncode(kvp.Value)}";
             }
+
             return joined;
         }
 
         /// <summary>
         /// Executes the login by using the Steam Website.
         /// </summary> 
+        /// <returns>Return an Account</returns>
         public static Account DoLogin(string username, string password, string machineAuth = "")
         {
             Thread.Sleep(2000);
             RsaHelper rsaHelper = new RsaHelper(username, password);
             string encryptedBase64Password = rsaHelper.EncryptPassword();
-            if(encryptedBase64Password == null) return null;
-            
+            if (encryptedBase64Password == null)
+            {
+                return null;
+            }
+
             DoLoginResult loginJson = null;
             CookieCollection cookieCollection;
-            string steamGuardText = "";
-            string steamGuardId = "";
-            string twoFactorText = "";
+            string steamGuardText = string.Empty;
+            string steamGuardId = string.Empty;
+            string twoFactorText = string.Empty;
 
             do
             {
@@ -236,17 +258,19 @@ namespace CSharpTradeOffers
                 var capGid = "-1";
 
                 if (loginJson != null && loginJson.CaptchaNeeded)
+                {
                     capGid = Uri.EscapeDataString(loginJson.CaptchaGid);
+                }
 
                 var data = new Dictionary<string, string>
                 {
                     {"password", encryptedBase64Password},
                     {"username", username},
-                    {"loginfriendlyname", ""},
+                    {"loginfriendlyname", string.Empty},
                     {"rememberlogin", "false"}
                 };
-                // Captcha
-                string capText = "";
+                //// Captcha
+                string capText = string.Empty;
                 if (captcha)
                 {
                     System.Diagnostics.Process.Start("https://steamcommunity.com/public/captcha.php?gid=" + loginJson.CaptchaGid);
@@ -255,9 +279,9 @@ namespace CSharpTradeOffers
                     capText = Console.ReadLine();
                 }
 
-                data.Add("captchagid", captcha ? capGid : "");
-                data.Add("captcha_text", captcha ? capText : "");
-                // Captcha end
+                data.Add("captchagid", captcha ? capGid : string.Empty);
+                data.Add("captcha_text", captcha ? capText : string.Empty);
+                //// Captcha end
 
                 // SteamGuard
                 if (steamGuard)
@@ -269,16 +293,16 @@ namespace CSharpTradeOffers
 
                 data.Add("emailauth", steamGuardText);
                 data.Add("emailsteamid", steamGuardId);
-                // SteamGuard end
+                //// SteamGuard end
 
-                //TwoFactor
+                // TwoFactor
                 if (twoFactor)
                 {
                     Console.WriteLine("TwoFactor code required: ");
                     twoFactorText = Console.ReadLine();
                 }
 
-                data.Add("twofactorcode", twoFactor ? twoFactorText : "");
+                data.Add("twofactorcode", twoFactor ? twoFactorText : string.Empty);
 
                 data.Add("rsatimestamp", time);
 
@@ -306,18 +330,24 @@ namespace CSharpTradeOffers
             Account account;
 
             if (loginJson.EmailSteamId != null)
+            {
                 account = new Account(Convert.ToUInt64(loginJson.EmailSteamId));
+            }
             else if (loginJson.TransferParameters?.Steamid != null)
+            {
                 account = new Account(Convert.ToUInt64(loginJson.TransferParameters.Steamid));
+            }
             else
+            {
                 return null;
+            }
 
             if (loginJson.Success)
             {
-                _cookies = new CookieContainer();
+                cookies = new CookieContainer();
                 foreach (Cookie cookie in cookieCollection)
                 {
-                    _cookies.Add(cookie);
+                    cookies.Add(cookie);
                     switch (cookie.Name)
                     {
                         case "steamLogin":
@@ -333,27 +363,34 @@ namespace CSharpTradeOffers
                             TimezoneOffset = cookie.Value;
                             break;
                     }
-                    if (!cookie.Name.StartsWith("steamMachineAuth")) continue;
+
+                    if (!cookie.Name.StartsWith("steamMachineAuth"))
+                    {
+                        continue;
+                    }
+
                     SteamMachineAuth = cookie.Name + "=" + cookie.Value;
                 }
 
                 if (!string.IsNullOrEmpty(SteamMachineAuth))
+                {
                     account.AddMachineAuthCookies(SteamMachineAuth);
+                }
 
-                SubmitCookies(_cookies);
+                SubmitCookies(cookies);
 
-                account.AuthContainer.Add(_cookies.GetCookies(new Uri("https://steamcommunity.com"))["sessionid"]);
+                account.AuthContainer.Add(cookies.GetCookies(new Uri("https://steamcommunity.com"))["sessionid"]);
 
-                SessionId = _cookies.GetCookies(new Uri("https://steamcommunity.com"))["sessionid"]?.Value;
+                SessionId = cookies.GetCookies(new Uri("https://steamcommunity.com"))["sessionid"]?.Value;
 
                 return account;
             }
+
             Console.WriteLine("SteamWeb Error: " + loginJson.Message);
             return null;
         }
 
-        public static Account RetryDoLogin(string username, string password, string machineAuth = "",
-            int retryLimit = 10, int retryWait = 500)
+        public static Account RetryDoLogin(string username, string password, string machineAuth = "", int retryLimit = 10, int retryWait = 500)
         {
             int retries = 0;
             Account account = null;
@@ -366,7 +403,11 @@ namespace CSharpTradeOffers
                 catch (WebException)
                 {
                     retries++;
-                    if (retries == retryLimit) throw;
+                    if (retries == retryLimit)
+                    {
+                        throw;
+                    }
+
                     Console.WriteLine("Connection failed... retrying in: " + retryWait + "ms. Retries: " + retries);
                     Thread.Sleep(retryWait);
                 }
@@ -374,7 +415,7 @@ namespace CSharpTradeOffers
             return account;
         }
 
-        static void SubmitCookies(CookieContainer cookies)
+        private static void SubmitCookies(CookieContainer cookies)
         {
             var w = WebRequest.Create("https://steamcommunity.com/") as HttpWebRequest;
 
@@ -391,31 +432,38 @@ namespace CSharpTradeOffers
 
         public class RsaHelper
         {
-            private readonly string _username;
+            private readonly string username;
 
-            private readonly string _password;
+            private readonly string password;
 
             public RsaHelper(string username, string password)
             {
-                _username = username;
-                _password = password;
+                this.username = username;
+                this.password = password;
             }
 
             public bool RequestRsaKey()
             {
-                var data = new Dictionary<string, string> { { "username", _username } };
+                var data = new Dictionary<string, string> { { "username", this.username } };
                 string response = Fetch("https://steamcommunity.com/login/getrsakey", "POST", data);
                 GetRsaKey rsaJson = JsonConvert.DeserializeObject<GetRsaKey>(response);
-                if (!rsaJson.Success) return false;
+                if (!rsaJson.Success)
+                {
+                    return false;
+                }
+
                 RsaJson = rsaJson;
                 return true;
             }
 
             public string EncryptPassword()
             {
-                if (!RequestRsaKey()) return null;
+                if (!RequestRsaKey())
+                {
+                    return null;
+                }
 
-                //RSA Encryption
+                // RSA Encryption
                 var rsa = new RSACryptoServiceProvider();
                 var rsaParameters = new RSAParameters
                 {
@@ -423,10 +471,9 @@ namespace CSharpTradeOffers
                     Modulus = HexToByte(RsaJson.PublicKeyMod)
                 };
 
-
                 rsa.ImportParameters(rsaParameters);
 
-                byte[] bytePassword = Encoding.ASCII.GetBytes(_password);
+                byte[] bytePassword = Encoding.ASCII.GetBytes(this.password);
                 byte[] encodedPassword = rsa.Encrypt(bytePassword, false);
                 return Convert.ToBase64String(encodedPassword);
             }
@@ -434,7 +481,9 @@ namespace CSharpTradeOffers
             private static byte[] HexToByte(string hex)
             {
                 if (hex.Length % 2 == 1)
+                {
                     throw new Exception("The binary key cannot have an odd number of digits");
+                }
 
                 byte[] arr = new byte[hex.Length >> 1];
                 int l = hex.Length;
@@ -457,7 +506,6 @@ namespace CSharpTradeOffers
         }
 
         // JSON Classes
-
         public class GetRsaKey
         {
             [JsonProperty("success")]
@@ -469,7 +517,6 @@ namespace CSharpTradeOffers
             [JsonProperty("timestamp")]
             public string TimeStamp { get; set; }
         }
-        
 
         [JsonObject(Title = "RootObject")]
         public class DoLoginResult

@@ -10,5 +10,4 @@ namespace CSharpTradeOffers.Community
         [JsonProperty("success")]
         public int Success { get; set; }
     }
-
 }

@@ -5,7 +5,6 @@ namespace CSharpTradeOffers.Community
     [JsonObject(Title = "RootObject")]
     public class CommentResponse
     {
-
         [JsonProperty("success")]
         public bool Success { get; set; }
 

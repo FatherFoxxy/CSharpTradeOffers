@@ -9,14 +9,14 @@ namespace CSharpTradeOffers.Trading
     /// </summary>
     public class InventoryHandler
     {
-        private readonly ulong _steamId;
+        private readonly ulong steamId;
 
-        private readonly string _apiKey;
+        private readonly string apiKey;
 
         public InventoryHandler(ulong steamId, string apiKey)
         {
-            _steamId = steamId;
-            _apiKey = apiKey;
+            this.steamId = steamId;
+            this.apiKey = apiKey;
             Inventories = new Dictionary<uint, Inventory>();
         }
 
@@ -26,10 +26,12 @@ namespace CSharpTradeOffers.Trading
         {
             Inventories.Clear();
             foreach (uint appid in appids.Where(appid => !Inventories.ContainsKey(appid)))
-                Inventories.Add(appid, new Inventory(_steamId, appid));
+            {
+                Inventories.Add(appid, new Inventory(this.steamId, appid));
+            }
         }
 
-        //predicate
+        // predicate
         private static bool BeingUsed(RgInventoryItem rgInventoryItem)
         {
             return rgInventoryItem.InUse;
@@ -45,27 +47,48 @@ namespace CSharpTradeOffers.Trading
             Inventory inv = Inventories[assetToFind.AppId];
             switch (assetToFind.TypeId)
             {
-                case 0: //exact
-                    foreach (Item item in inv.Items.Values.Where(item => item.MarketHashName == assetToFind.TypeObj).Where(item => !item.Items.TrueForAll(BeingUsed)))
+                case 0: // exact
+                    foreach (
+                        Item item in
+                            inv.Items.Values.Where(item => item.MarketHashName == assetToFind.TypeObj)
+                                .Where(item => !item.Items.TrueForAll(BeingUsed)))
+                    {
                         return item;
+                    }
+
                     break;
-                case 1: //contains
-                    foreach (Item item in inv.Items.Values.Where(item => item.MarketHashName.ToLower().Contains(assetToFind.TypeObj)).Where(item => !item.Items.TrueForAll(BeingUsed)))
+                case 1: // contains
+                    foreach (
+                        Item item in
+                            inv.Items.Values.Where(item => item.MarketHashName.ToLower().Contains(assetToFind.TypeObj))
+                                .Where(item => !item.Items.TrueForAll(BeingUsed)))
+                    {
                         return item;
+                    }
+
                     break;
-                case 2: //startswirth
-                    foreach (Item item in inv.Items.Values.Where(item => item.MarketHashName.ToLower().StartsWith(assetToFind.TypeObj)).Where(item => !item.Items.TrueForAll(BeingUsed)))
-                        return item;
-                    break;
-                case 3: //classid
+                case 2: // startswirth
                     foreach (
                         Item item in
                             inv.Items.Values.Where(
-                                item => item.ClassId == assetToFind.TypeObj && item.Items.TrueForAll(BeingUsed)))
+                                item => item.MarketHashName.ToLower().StartsWith(assetToFind.TypeObj))
+                                .Where(item => !item.Items.TrueForAll(BeingUsed)))
+                    {
                         return item;
+                    }
+
+                    break;
+                case 3: // classid
+                    foreach (Item item in
+                        inv.Items.Values.Where(
+                            item => item.ClassId == assetToFind.TypeObj && item.Items.TrueForAll(BeingUsed)))
+                    {
+                        return item;
+                    }
+
                     return null;
-                case 4: //tags
-                    var handler = new SteamEconomyHandler(_apiKey);
+                case 4: // tags
+                    var handler = new SteamEconomyHandler(this.apiKey);
                     foreach (var item in inv.Items.Values)
                     {
                         Dictionary<string, string> classid = new Dictionary<string, string>
@@ -77,15 +100,21 @@ namespace CSharpTradeOffers.Trading
                         {
                             if (tag.Name == assetToFind.TypeObj)
                             {
-                                if (!item.Items.TrueForAll(BeingUsed)) return item;
+                                if (!item.Items.TrueForAll(BeingUsed))
+                                {
+                                    return item; 
+                                }
+
                                 break;
                             }
                         }
                     }
+
                     break;
                 default:
                     throw new Exception("Unknown TypeId!");
             }
+
             return null;
         }
 
@@ -107,7 +136,7 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public Item FindUnusedItem(CEconAsset assetToFind, Inventory inv)
         {
-            //Inventory inv = Inventories[Convert.ToUInt32(assetToFind.appid)];
+            // Inventory inv = Inventories[Convert.ToUInt32(assetToFind.appid)];
             return inv.Items[assetToFind.ClassId];
         }
 
@@ -130,7 +159,9 @@ namespace CSharpTradeOffers.Trading
         public void MarkMyAssets(CEconTradeOffer offer, bool inUse)
         {
             foreach (CEconAsset asset in offer.ItemsToGive)
+            {
                 Inventories[Convert.ToUInt32(asset.AppId)].MarkAsset(asset, inUse);
+            }
         }
 
         /// <summary>
@@ -141,7 +172,9 @@ namespace CSharpTradeOffers.Trading
         public void MarkMyAssets(TradeOffer offer, bool inUse)
         {
             foreach (var asset in offer.Me.Assets)
+            {
                 Inventories[Convert.ToUInt32(asset.AppId)].MarkAsset(asset, inUse);
+            }
         } 
 
         /// <summary>
@@ -151,7 +184,11 @@ namespace CSharpTradeOffers.Trading
         /// <returns>A decimal worth in USD.</returns>
         public decimal ItemWorth(Item item)
         {
-            if (item.Tradable != 1) return 0.0m;
+            if (item.Tradable != 1)
+            {
+                return 0.0m;
+            }
+
             var handler = new MarketHandler();
             MarketValue mv = handler.GetPriceOverview(Convert.ToUInt32(item.AppId), item.MarketHashName);
             return Convert.ToDecimal(mv.MedianPrice.Substring(1));
@@ -163,20 +200,27 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public decimal ItemWorth(bool marketable, uint appid, string marketHashName)
         {
-            if (marketable.IntValue() != 1) return 0.0m;
+            if (marketable.IntValue() != 1)
+            {
+                return 0.0m;
+            }
+
             var handler = new MarketHandler();
             MarketValue mv = handler.GetPriceOverview(Convert.ToUInt32(appid), marketHashName);
             return Convert.ToDecimal(mv.MedianPrice.Substring(1));
         }
-
-
+        
         /// <param name="marketable"></param>
         /// <param name="appid"></param>
         /// <param name="marketHashName"></param>
         /// <returns></returns>
         public decimal ItemWorth(int marketable, uint appid, string marketHashName)
         {
-            if (marketable != 1) return 0.0m;
+            if (marketable != 1)
+            {
+                return 0.0m;
+            }
+
             var handler = new MarketHandler();
             MarketValue mv = handler.GetPriceOverview(Convert.ToUInt32(appid), marketHashName);
             return Convert.ToDecimal(mv.MedianPrice.Substring(1));

@@ -9,13 +9,13 @@ namespace CSharpTradeOffers.Trading
     /// </summary>
     public class EconServiceHandler
     {
-        private readonly string _apiKey;
-
         private const string BaseUrl = "https://api.steampowered.com/IEconService/";
+
+        private readonly string apiKey;
 
         public EconServiceHandler(string apiKey)
         {
-            _apiKey = apiKey;
+            this.apiKey = apiKey;
         }
 
         /// <summary>
@@ -26,12 +26,11 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public TradeOffersList GetTradeOffers(Dictionary<string, string> data)
         {
-            const string url = BaseUrl + "GetTradeOffers/v1/";
-            data.Add("key", _apiKey);
+            data.Add("key", this.apiKey);
             data.Add("format", "json");
             return
                 JsonConvert.DeserializeObject<TradeOffers>(
-                    WebUtility.UrlDecode(Web.Fetch(url, "GET", data))).Response;
+                    WebUtility.UrlDecode(Web.Fetch(BaseUrl + "GetTradeOffers/v1/", "GET", data))).Response;
         }
 
         /// <summary>
@@ -42,17 +41,16 @@ namespace CSharpTradeOffers.Trading
         /// <returns>A CEConTradeOffer object.</returns>
         public CEconTradeOffer GetTradeOffer(ulong tradeofferid, string language = "english")
         {
-            const string url = BaseUrl + "GetTradeOffer/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"tradeofferid", tradeofferid.ToString()},
                 {"language", language},
                 {"format", "json"}
             };
             return
                 JsonConvert.DeserializeObject<CEconTradeOffer>(
-                    WebUtility.UrlDecode(Web.Fetch(url, "GET", data)));
+                    WebUtility.UrlDecode(Web.Fetch(BaseUrl + "GetTradeOffer/v1/", "GET", data)));
         }
 
         /// <summary>
@@ -62,14 +60,13 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public string DeclineTradeOffer(ulong tradeofferid)
         {
-            const string url = BaseUrl + "DeclineTradeOffer/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"tradeofferid", tradeofferid.ToString()},
                 {"format", "json"}
             };
-            return Web.Fetch(url, "POST", data);
+            return Web.Fetch(BaseUrl + "DeclineTradeOffer/v1/", "POST", data);
         }
 
         /// <summary>
@@ -79,14 +76,13 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public string CancelTradeOffer(ulong tradeofferid)
         {
-            const string url = BaseUrl + "CancelTradeOffer/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"tradeofferid", tradeofferid.ToString()},
                 {"format", "json"}
             };
-            return WebUtility.UrlDecode(Web.Fetch(url, "POST", data));
+            return WebUtility.UrlDecode(Web.Fetch(BaseUrl + "CancelTradeOffer/v1/", "POST", data));
         }
 
         /// <summary>
@@ -99,19 +95,19 @@ namespace CSharpTradeOffers.Trading
         /// <returns>The TradeId of the offer that was accepted.</returns>
         public Trade AcceptTradeOffer(Trade tradeId, CookieContainer container, uint partnerId, string serverid)
         {
-            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") {Domain = "steamcommunity.com"});
-            const string url = "https://steamcommunity.com/tradeoffer/{0}/accept";
+            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") { Domain = "steamcommunity.com" });
             var data = new Dictionary<string, string>
             {
                 {"sessionid", Web.SessionId},
                 {"serverid", serverid},
                 {"tradeofferid", tradeId.TradeId.ToString()},
                 {"partner", SteamIdOperations.ConvertAccountIdToUlong(partnerId).ToString()},
-                {"captcha", ""}
+                {"captcha", string.Empty}
             };
             return
                 JsonConvert.DeserializeObject<Trade>(
-                    WebUtility.UrlDecode(Web.Fetch(string.Format(url, tradeId.TradeId), "POST",
+                    WebUtility.UrlDecode(Web.Fetch(
+                        $"https://steamcommunity.com/tradeoffer/{tradeId.TradeId}/accept", "POST",
                         data, container, false, "https://steamcommunity.com/tradeoffer/" + tradeId.TradeId + "/")));
         }
 
@@ -125,19 +121,19 @@ namespace CSharpTradeOffers.Trading
         /// <returns>The TradeId of the offer that was accepted.</returns>
         public Trade AcceptTradeOffer(ulong tradeId, CookieContainer container, uint partnerId, string serverid)
         {
-            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") {Domain = "steamcommunity.com"});
-            const string url = "https://steamcommunity.com/tradeoffer/{0}/accept";
+            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") { Domain = "steamcommunity.com" });
             var data = new Dictionary<string, string>
             {
                 {"sessionid", Web.SessionId},
                 {"serverid", serverid},
                 {"tradeofferid", tradeId.ToString()},
                 {"partner", SteamIdOperations.ConvertAccountIdToUlong(partnerId).ToString()},
-                {"captcha", ""}
+                {"captcha", string.Empty}
             };
             return
                 JsonConvert.DeserializeObject<Trade>(
-                    WebUtility.UrlDecode(Web.Fetch(string.Format(url, tradeId), "POST",
+                    WebUtility.UrlDecode(Web.Fetch(
+                        $"https://steamcommunity.com/tradeoffer/{tradeId}/accept", "POST",
                         data, container, false, "https://steamcommunity.com/tradeoffer/" + tradeId + "/")));
         }
 
@@ -150,11 +146,11 @@ namespace CSharpTradeOffers.Trading
         /// <param name="serverid">Almost always 1, not quite sure what other numbers do.</param>
         /// <param name="offer">A TradeOffer object containing the trade parameters.</param>
         /// <returns>A SendOfferResponse object.</returns>
-        public SendOfferResponse SendTradeOffer(ulong partnerSid, CookieContainer container, string tradeoffermessage,
+        public SendOfferResponse SendTradeOffer(
+            ulong partnerSid, CookieContainer container, string tradeoffermessage,
             string serverid, TradeOffer offer)
         {
-            const string url = "https://steamcommunity.com/tradeoffer/new/send";
-            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") {Domain = "steamcommunity.com"});
+            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") { Domain = "steamcommunity.com" });
 
             var data = new Dictionary<string, string>
             {
@@ -163,12 +159,16 @@ namespace CSharpTradeOffers.Trading
                 {"partner", partnerSid.ToString()},
                 {"tradeoffermessage", tradeoffermessage},
                 {"json_tradeoffer", JsonConvert.SerializeObject(offer)},
-                {"captcha", ""},
+                {"captcha", string.Empty},
                 {"trade_offer_create_params", "{}"}
             };
-            return JsonConvert.DeserializeObject<SendOfferResponse>(Web.Fetch(url, "POST", data, container, false,
-                "https://steamcommunity.com/tradeoffer/new/?partner=" +
-                SteamIdOperations.ConvertSteamIdToAccountId(SteamIdOperations.ConvertUlongToSteamId(partnerSid))));
+            uint accountId =
+                SteamIdOperations.ConvertSteamIdToAccountId(SteamIdOperations.ConvertUlongToSteamId(partnerSid));
+
+            return JsonConvert.DeserializeObject<SendOfferResponse>(
+                Web.Fetch(
+                    "https://steamcommunity.com/tradeoffer/new/send", "POST", data, container, false,
+                    "https://steamcommunity.com/tradeoffer/new/?partner=" + accountId));
         }
 
         /// <summary>
@@ -181,11 +181,11 @@ namespace CSharpTradeOffers.Trading
         /// <param name="tradeofferidCountered">The TradeId of the offer to counter or modify.</param>
         /// <param name="offer">A TradeOffer object containing the trade parameters. </param>
         /// <returns>A SendOfferResponse object.</returns>
-        public SendOfferResponse ModifyTradeOffer(ulong partnerSid, CookieContainer container, string tradeoffermessage,
+        public SendOfferResponse ModifyTradeOffer(
+            ulong partnerSid, CookieContainer container, string tradeoffermessage,
             string serverid, uint tradeofferidCountered, TradeOffer offer)
         {
-            const string url = "https://steamcommunity.com/tradeoffer/new/send";
-            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") {Domain = "steamcommunity.com"});
+            container.Add(new Cookie("bCompletedTradeOfferTutorial", "true") { Domain = "steamcommunity.com" });
 
             var data = new Dictionary<string, string>
             {
@@ -194,12 +194,14 @@ namespace CSharpTradeOffers.Trading
                 {"partner", partnerSid.ToString()},
                 {"tradeoffermessage", tradeoffermessage},
                 {"json_tradeoffer", JsonConvert.SerializeObject(offer)},
-                {"captcha", ""},
+                {"captcha", string.Empty},
                 {"trade_offer_create_params", "{}"},
                 {"tradeofferid_countered", tradeofferidCountered.ToString()}
             };
-            return JsonConvert.DeserializeObject<SendOfferResponse>(Web.Fetch(url, "POST", data, container, false,
-                "https://steamcommunity.com/tradeoffer/" + tradeofferidCountered + "/"));
+            return JsonConvert.DeserializeObject<SendOfferResponse>(
+                Web.Fetch(
+                    "https://steamcommunity.com/tradeoffer/new/send", "POST", data, container, false,
+                    "https://steamcommunity.com/tradeoffer/" + tradeofferidCountered + "/"));
         }
 
         /// <summary>
@@ -209,14 +211,13 @@ namespace CSharpTradeOffers.Trading
         /// <returns></returns>
         public GetTradeOffersSummaryResponse GetTradeOffersSummary(uint timeLastVisit)
         {
-            const string url = BaseUrl + "GetTradeOffersSummary/v1/";
             var data = new Dictionary<string, string>
             {
-                {"key", _apiKey},
+                {"key", this.apiKey},
                 {"time_last_visit", timeLastVisit.ToString()}
             };
             return
-                JsonConvert.DeserializeObject<GetTradeOffersSummaryBaseResponse>(Web.Fetch(url, "GET", data)).Response;
+                JsonConvert.DeserializeObject<GetTradeOffersSummaryBaseResponse>(Web.Fetch(BaseUrl + "GetTradeOffersSummary/v1/", "GET", data)).Response;
         }
     }
 }

@@ -13,12 +13,12 @@ namespace CSharpTradeOffers.Configuration
         /// <summary>
         /// The meat of the config
         /// </summary>
-        public RootConfig Cfg = new RootConfig();
+        public RootConfig Cfg { get; set; } = new RootConfig();
 
         /// <summary>
         /// Dictionary forms of the lists contained in for easy access/use
         /// </summary>
-        public Dictionaries ConfigDictionaries = new Dictionaries();
+        public Dictionaries ConfigDictionaries { get; } = new Dictionaries();
 
         /// <summary>
         /// I forgot why I put this here but it's probably important.
@@ -26,15 +26,15 @@ namespace CSharpTradeOffers.Configuration
         /// </summary>
         public string MarketEligibilityJson { get; set; }
 
-        private readonly string _path;
+        private readonly string path;
 
         /// <summary>
-        /// Initializes the Config and the path to use
+        /// the Config and the path to use
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Path of the configuration file</param>
         public Config(string path)
         {
-            _path = path;
+            this.path = path;
         }
 
         /// <summary>
@@ -43,13 +43,11 @@ namespace CSharpTradeOffers.Configuration
         /// <returns>A RootConfig object.</returns>
         public RootConfig Reload()
         {
-            if (!File.Exists(_path))
+            if (!File.Exists(this.path))
             {
-                File.Create(_path).Close();
+                File.Create(this.path).Close();
 
-                #region append
                 // BuildMyString.com generated code. Please enjoy your string responsibly.
-
                 var sb = new StringBuilder();
 
                 sb.Append("{\r\n");
@@ -73,25 +71,25 @@ namespace CSharpTradeOffers.Configuration
                 sb.Append("    \"Inventories\":[440,730],\r\n");
                 sb.Append("    \"Banned_Users\": []\r\n");
                 sb.Append("}\r\n");
-                #endregion
 
-                File.WriteAllText(_path, sb.ToString());
+                File.WriteAllText(this.path, sb.ToString());
 
-                ConfigDictionaries.Officers_Dict.Clear();
-                ConfigDictionaries.Command_Permissions_Dict.Clear();
+                this.ConfigDictionaries.OfficersDict.Clear();
+                this.ConfigDictionaries.CommandPermissionsDict.Clear();
 
-                foreach (var kvp in Cfg.Officers.Select(officer => officer.ToKeyValuePair()))
+                foreach (var kvp in this.Cfg.Officers.Select(officer => officer.ToKeyValuePair()))
                 {
-                    ConfigDictionaries.Officers_Dict.Add(kvp.Key, kvp.Value);
+                    this.ConfigDictionaries.OfficersDict.Add(kvp.Key, kvp.Value);
                 }
-                foreach (var kvp in Cfg.CommandPermissions.Select(permission => permission.ToKeyValuePair()))
+
+                foreach (var kvp in this.Cfg.CommandPermissions.Select(permission => permission.ToKeyValuePair()))
                 {
-                    ConfigDictionaries.Command_Permissions_Dict.Add(kvp.Key, kvp.Value);
+                    this.ConfigDictionaries.CommandPermissionsDict.Add(kvp.Key, kvp.Value);
                 }
             }
 
-            Cfg = JsonConvert.DeserializeObject<RootConfig>(File.ReadAllText(_path)); // js.Deserialize<RootConfig>(File.ReadAllText(_path));
-            return Cfg;
+            this.Cfg = JsonConvert.DeserializeObject<RootConfig>(File.ReadAllText(this.path)); // js.Deserialize<RootConfig>(File.ReadAllText(_path));
+            return this.Cfg;
         }
 
         /// <summary>
@@ -100,7 +98,7 @@ namespace CSharpTradeOffers.Configuration
         /// <param name="towrite"></param>
         public void WriteChanges(RootConfig towrite)
         {
-            File.WriteAllText(_path, JsonConvert.SerializeObject(towrite));
+            File.WriteAllText(this.path, JsonConvert.SerializeObject(towrite));
         }
     }
 }

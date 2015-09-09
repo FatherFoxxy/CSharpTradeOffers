@@ -25,8 +25,8 @@ namespace CSharpTradeOffers.Community
             string url = "https://steamcommunity.com/comment/Profile/post/" + steamId + "/-1/";
 
             string sessionid = (from Cookie cookie in authContainer.GetCookies(new Uri("https://steamcommunity.com"))
-                where cookie.Name == "sessionid"
-                select cookie.Value).FirstOrDefault();
+                                where cookie.Name == "sessionid"
+                                select cookie.Value).FirstOrDefault();
 
             var data = new Dictionary<string, string>
             {
@@ -48,14 +48,13 @@ namespace CSharpTradeOffers.Community
         /// <param name="count">Almost certainly useless and never needs to be touched.
         /// I assume that it is the member count but it can be null, non-existant, or any number under the sun.</param>
         /// <returns>A ClanCommentResponse object.</returns>
-        public ClanCommentResponse PostClanComment(ulong clanId, string comment, CookieContainer authContainer,
-            int count = 0)
+        public ClanCommentResponse PostClanComment(ulong clanId, string comment, CookieContainer authContainer, int count = 0)
         {
             string url = "http://steamcommunity.com/comment/Clan/post/" + clanId + "/-1/";
 
             string sessionid = (from Cookie cookie in authContainer.GetCookies(new Uri("https://steamcommunity.com"))
-                where cookie.Name == "sessionid"
-                select cookie.Value).FirstOrDefault();
+                                where cookie.Name == "sessionid"
+                                select cookie.Value).FirstOrDefault();
 
             var data = new Dictionary<string, string>
             {
@@ -109,7 +108,7 @@ namespace CSharpTradeOffers.Community
             {
                 {"sessionID", sessionid},
                 {"steamid", steamId.ToString()},
-                {"accept_invite","1" }
+                {"accept_invite", "1"}
             };
 
             return Convert.ToBoolean(Web.Fetch(url, "POST", data, authContainer));
@@ -120,7 +119,7 @@ namespace CSharpTradeOffers.Community
         /// </summary>
         /// <param name="steamId">SteamId64 of the friend to remove.</param>
         /// <param name="authContainer">Auth container of the user.</param>
-        /// <returns>Bollean representing the successs of the function.</returns>
+        /// <returns>Boolean representing the successs of the function.</returns>
         public bool RemoveFriend(ulong steamId, CookieContainer authContainer)
         {
             string url = "https://steamcommunity.com/actions/RemoveFriendAjax";
@@ -146,13 +145,11 @@ namespace CSharpTradeOffers.Community
         /// <param name="group">The SteamId64 of the group to invite to.</param>
         /// <param name="authContainer">Auth Cookies MUST be passed here, the function will fail if not.</param>
         /// <returns>An InviteResponse object.</returns>
-        public InviteResponse InviteUserToGroup(ulong steamId, bool json, ulong group,
-            CookieContainer authContainer)
+        public InviteResponse InviteUserToGroup(ulong steamId, bool json, ulong group, CookieContainer authContainer)
         {
-            const string url = "https://steamcommunity.com/actions/GroupInvite/";
             string sessionid = (from Cookie cookie in authContainer.GetCookies(new Uri("https://steamcommunity.com"))
-                where cookie.Name == "sessionid"
-                select cookie.Value).FirstOrDefault();
+                                where cookie.Name == "sessionid"
+                                select cookie.Value).FirstOrDefault();
             var data = new Dictionary<string, string>
             {
                 {"json", json.IntValue().ToString()},
@@ -161,7 +158,7 @@ namespace CSharpTradeOffers.Community
                 {"sessionID", sessionid},
                 {"invitee", steamId.ToString()}
             };
-            return JsonConvert.DeserializeObject<InviteResponse>(Web.Fetch(url, "POST", data, authContainer));
+            return JsonConvert.DeserializeObject<InviteResponse>(Web.Fetch("https://steamcommunity.com/actions/GroupInvite/", "POST", data, authContainer));
         }
 
         /// <summary>
@@ -172,13 +169,11 @@ namespace CSharpTradeOffers.Community
         /// <param name="group">The SteamId64 of the group to invite the users to.</param>
         /// <param name="authContainer">Auth Cookies MUST be passed here, the function will fail if not.</param>
         /// <returns>A MultiInviteResponse object.</returns>
-        public MultiInviteResponse InviteUsersToGroup(ulong[] steamIds, bool json, ulong group,
-            CookieContainer authContainer)
+        public MultiInviteResponse InviteUsersToGroup(ulong[] steamIds, bool json, ulong group, CookieContainer authContainer)
         {
-            const string url = "https://steamcommunity.com/actions/GroupInvite/";
             string sessionid = (from Cookie cookie in authContainer.GetCookies(new Uri("https://steamcommunity.com"))
-                where cookie.Name == "sessionid"
-                select cookie.Value).FirstOrDefault();
+                                where cookie.Name == "sessionid"
+                                select cookie.Value).FirstOrDefault();
             var data = new Dictionary<string, string>
             {
                 {"json", json.IntValue().ToString()},
@@ -187,7 +182,7 @@ namespace CSharpTradeOffers.Community
                 {"sessionID", sessionid},
                 {"invitee_list", ToJArray(steamIds)}
             };
-            return JsonConvert.DeserializeObject<MultiInviteResponse>(Web.Fetch(url, "POST", data, authContainer));
+            return JsonConvert.DeserializeObject<MultiInviteResponse>(Web.Fetch("https://steamcommunity.com/actions/GroupInvite/", "POST", data, authContainer));
         }
 
         /// <summary>
@@ -197,8 +192,7 @@ namespace CSharpTradeOffers.Community
         /// <returns></returns>
         public string ToJArray(ulong[] items)
         {
-            const string formatter = "\"{0}\",";
-            string jArray = items.Aggregate("[", (current, item) => current + string.Format(formatter, item.ToString()));
+            string jArray = items.Aggregate("[", (current, item) => current + $"\"{item.ToString()}\",");
             jArray = jArray.Substring(0, jArray.Length - 1);
             jArray += "]";
             return jArray;
@@ -211,11 +205,11 @@ namespace CSharpTradeOffers.Community
         /// <returns>A memberList object.</returns>
         public MemberList RequestMemberList(ulong groupId)
         {
-            const string url = "http://steamcommunity.com/gid/{0}/memberslistxml/?xml=1";
 
             return
                 (MemberList)
-                    new XmlSerializer(typeof (MemberList)).Deserialize(Web.FetchStream(string.Format(url, groupId),
+                    new XmlSerializer(typeof(MemberList)).Deserialize(Web.FetchStream(
+                        $"http://steamcommunity.com/gid/{groupId}/memberslistxml/?xml=1",
                         "GET"));
         }
 
@@ -226,11 +220,10 @@ namespace CSharpTradeOffers.Community
         /// <returns>A memberList object.</returns>
         public MemberList RequestMemberList(string groupName)
         {
-            const string url = "http://steamcommunity.com/groups/{0}/memberslistxml/?xml=1";
-
             return
                 (MemberList)
-                    new XmlSerializer(typeof (MemberList)).Deserialize(Web.FetchStream(string.Format(url, groupName),
+                    new XmlSerializer(typeof(MemberList)).Deserialize(Web.FetchStream(
+                        $"http://steamcommunity.com/groups/{groupName}/memberslistxml/?xml=1",
                         "GET"));
         }
 
@@ -244,7 +237,6 @@ namespace CSharpTradeOffers.Community
         public List<MemberList> RequestAllMemberLists(ulong groupId, int retryWait = 1000, int retryCount = 10)
         {
             var membersList = new List<MemberList>();
-            const string url = "http://steamcommunity.com/gid/{0}/memberslistxml/?xml=1&p={1}";
 
             ulong count = 1;
             ulong totalPages = 1;
@@ -252,13 +244,12 @@ namespace CSharpTradeOffers.Community
 
             do
             {
-                string temp = string.Format(url, groupId, count);
+                string temp = $"http://steamcommunity.com/gid/{groupId}/memberslistxml/?xml=1&p={count}";
 
                 try
                 {
                     var populatedList = (MemberList)
-                        (new XmlSerializer(typeof (MemberList)).Deserialize(Web.RetryFetchStream(retryWait, retryCount,
-                            temp, "GET")));
+                        new XmlSerializer(typeof(MemberList)).Deserialize(Web.RetryFetchStream(retryWait, retryCount, temp, "GET"));
                     membersList.Add(populatedList);
                     if (!firstRequest)
                     {
@@ -274,6 +265,7 @@ namespace CSharpTradeOffers.Community
                 {
                     membersList.Add(null);
                 }
+
                 Thread.Sleep(1000);
 
                 count++;
@@ -292,21 +284,19 @@ namespace CSharpTradeOffers.Community
         public List<MemberList> RequestAllMemberLists(string groupName, int retryWait = 1000, int retryCount = 10)
         {
             var membersList = new List<MemberList>();
-            groupName = groupName.Replace(" ", "");
-            const string url = "http://steamcommunity.com/groups/{0}/memberslistxml/?xml=1&p={1}";
+            groupName = groupName.Replace(" ", string.Empty);
 
             ulong count = 1;
             ulong totalPages = 1;
             bool firstRequest = false;
             do
             {
-                string temp = string.Format(url, groupName, count);
+                string temp = $"http://steamcommunity.com/groups/{groupName}/memberslistxml/?xml=1&p={count}";
 
                 try
                 {
                     var populatedList = (MemberList)
-                        (new XmlSerializer(typeof (MemberList)).Deserialize(Web.RetryFetchStream(retryWait, retryCount,
-                            temp, "GET")));
+                        new XmlSerializer(typeof(MemberList)).Deserialize(Web.RetryFetchStream(retryWait, retryCount, temp, "GET"));
                     membersList.Add(populatedList);
 
                     if (!firstRequest)
@@ -323,6 +313,7 @@ namespace CSharpTradeOffers.Community
                 {
                     membersList.Add(null);
                 }
+
                 Thread.Sleep(1000);
 
                 count++;
@@ -338,14 +329,14 @@ namespace CSharpTradeOffers.Community
         /// <param name="profile">The object to specify the new profile data.</param>
         /// <param name="account">The account of the profile to modify.</param>
         /// <returns>Bool depending on the success of the request.</returns>
-        public bool SetProfile(Profile profile, Account account) //implement Settings as an interface!
+        public bool SetProfile(Profile profile, Account account) // implement Settings as an interface!
         {
             string url = "https://steamcommunity.com/profiles/" + account.SteamId + "/edit";
 
             string sessionid =
                 (from Cookie cookie in account.AuthContainer.GetCookies(new Uri("https://steamcommunity.com"))
-                    where cookie.Name == "sessionid"
-                    select cookie.Value).FirstOrDefault();
+                 where cookie.Name == "sessionid"
+                 select cookie.Value).FirstOrDefault();
 
             var data = new Dictionary<string, string>
             {
@@ -379,14 +370,14 @@ namespace CSharpTradeOffers.Community
         /// <param name="settings">Settings to set.</param>
         /// <param name="account">Account of settings to change.</param>
         public void SetPrivacySettings(PrivacySettings settings, Account account)
-            //implement settings as an interface later!
+        //// ToDo: implement settings as an interface later!
         {
             string url = "https://steamcommunity.com/profiles/" + account.SteamId + "/edit/settings";
 
             string sessionid =
                 (from Cookie cookie in account.AuthContainer.GetCookies(new Uri("https://steamcommunity.com"))
-                    where cookie.Name == "sessionid"
-                    select cookie.Value).FirstOrDefault();
+                 where cookie.Name == "sessionid"
+                 select cookie.Value).FirstOrDefault();
 
             var data = new Dictionary<string, string>
             {
