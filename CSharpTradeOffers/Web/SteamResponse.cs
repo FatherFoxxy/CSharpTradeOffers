@@ -60,7 +60,7 @@ namespace CSharpTradeOffers.Web
         public TSerializable DeserializeJson<TSerializable>()
         {
             string streamData = ReadStream();
-            return streamData == null ? default(TSerializable) : JsonConvert.DeserializeObject<TSerializable>(ReadStream());
+            return streamData == null ? default(TSerializable) : JsonConvert.DeserializeObject<TSerializable>(streamData);
         }
 
         /// <summary>
